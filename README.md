@@ -54,6 +54,7 @@ Llmint focuses on three objectives: accuracy, performance, and cost.
 
 **Accuracy.** 
 
+* Percentage of correct mappings. 
 * Precision:
 * Recall:
 * F1 score:
@@ -78,11 +79,13 @@ mint = llmint.new_mint()
 > TBD Example selection. Since it's unlikely that all examples are equally useful, llmint allows stateful matching with example selection to improve accuracy and reduce tokens
 
 > TBD Completion model.
->
+
 > TBD Deducting mapping from the values.
->
-> TBD Stored mappings for HSBK and RGB.
->
+
+> TBD Semantic handshaking 
+
+> TBD Support additional rules as part of examples
+
 > TBD Semantic handshaking 
 
 ## FAQ

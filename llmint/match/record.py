@@ -71,7 +71,7 @@ class RecordChatMatch(RecordMatch):
         """
         example_prompt = ChatPromptTemplate.from_messages(
             [
-                ("human", "The source schema is {source} and the target schema is {target}"),
+                ("human", "The source schema is {source} and the target schema is {target}."),
                 ("ai", "{correspondence}")
             ]
         )
@@ -106,5 +106,5 @@ class RecordChatMatch(RecordMatch):
         message = f"What are the correspondences " \
                   f"between schema {source_schema} " \
                   f"and schema {target_schema}? " \
-                  f"Answer using the same format as the example."
+                  f"Answer using the same format as the example. "
         return {"input_message": message}

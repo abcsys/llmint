@@ -1,4 +1,5 @@
 import os
+import inspect
 import logging
 import pprint
 import datetime
@@ -7,17 +8,30 @@ from typing import Optional
 logger: Optional[logging.Logger] = None
 
 
-def init_logger(log_file, add_timestamp=False):
+def log_name():
+    """Get the name and file of the function that called the current function."""
+    frame = inspect.stack()[1]
+    function_name = frame[3]
+    filename = os.path.basename(frame[1])
+
+    base_filename = os.path.splitext(filename)[0]
+    log_name = f"{base_filename}_{function_name}.log"
+    return log_name
+
+
+def init_logger(log_dir, log_file, add_timestamp=False):
     """
     Configure the logger with the given log file.
 
     Args:
+    - log_dir (str): The directory to store the log file.
     - log_file (str): The name of the log file.
     - add_timestamp (bool): If True, append a timestamp to the log file name.
     """
     global logger
+
     # Ensure the directory exists
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    os.makedirs(log_dir, exist_ok=True)
 
     if add_timestamp:
         # Extract the file extension if present
@@ -28,6 +42,8 @@ def init_logger(log_file, add_timestamp=False):
 
         # Combine file name, timestamp, and extension
         log_file = f"{file_name}_{timestamp}{file_extension}"
+
+    log_file = os.path.join(log_dir, log_file)
 
     logging.basicConfig(level=logging.INFO,
                         format='%(message)s',

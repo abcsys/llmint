@@ -17,7 +17,11 @@ def diff_lists(list1, list2):
     return diffs
 
 
-diff_corresp = diff_lists
+def diff_corresp(true, pred):
+    try:
+        return diff_lists(true, pred)
+    except:
+        return true
 
 
 def format_output(raw_output):

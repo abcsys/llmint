@@ -1,6 +1,8 @@
 import os
 from benchmark import util
-from benchmark.log import init_logger, log, header
+from benchmark.log import (
+    init_logger, log_name, log, header
+)
 import numpy as np
 
 from llmint.extract import from_mint_sample
@@ -12,7 +14,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "device", "flat_light.yaml"
+    "device", "flat_light_varied_value.yaml"
 )
 
 
@@ -79,8 +81,8 @@ def benchmark_vary_shot(
         filepath=default_dataset,
         test_size=0.5,
         # match params
-        model="gpt-3.5-turbo",
-        # model="gpt-4",
+        # model="gpt-3.5-turbo",
+        model="gpt-4",
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
@@ -88,7 +90,7 @@ def benchmark_vary_shot(
         max_num_shot=1,
         num_test=5,
         verbose=True,
-        seed=1,
+        seed=42,
 ):
     """
     Run a benchmark test on a device dataset with varying shots.
@@ -99,14 +101,16 @@ def benchmark_vary_shot(
     - model (str): Model name.
     - temperature (float): Sampling temperature for the model.
     - match_method (class or function): The matching method to use.
-    - num_max_shot (int): Maximum number of shots for the benchmark.
+    - min_num_shot (int): Minimum number of shots for the benchmark.
+    - max_num_shot (int): Maximum number of shots for the benchmark.
     - num_test (int): Number of test samples to use. None for using all.
 
     Returns:
     - Prints the benchmark results.
     """
     init_logger(
-        log_file=os.path.join(__log_dir__, "vary_shot.log"),
+        log_dir=__log_dir__,
+        log_file=log_name(),
         add_timestamp=True
     )
     log(f"Setup: {locals()}")
