@@ -24,7 +24,7 @@ class SimpleMatch:
         """
         example_prompt = ChatPromptTemplate.from_messages(
             [
-                ("human", "the source schema is {source} and the target schema is {target}"),
+                ("human", "The source schema is {source} and the target schema is {target}"),
                 ("ai", "{correspondence}")
             ]
         )
@@ -37,7 +37,7 @@ class SimpleMatch:
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "You are performing schema matching to identify the "
-                           "correspondences between fields."),
+                           "correspondences of fields between a source and a target schemas."),
                 few_shot_prompt,
                 ("human", "{input_message}")
             ]
