@@ -1,13 +1,14 @@
 import os
 from benchmark import util
 from benchmark.util import header
+from benchmark.log import init_logger, log
 import numpy as np
-import pprint as pp
 
 from llmint.extract import from_mint_sample
 from llmint.match.record import RecordChatMatch
 
 __dir__ = os.path.dirname(__file__)
+__log_dir__= os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
@@ -30,16 +31,16 @@ def format_output(prediction):
 def run(match, test_set):
     match_correct = []
 
-    print("Examples:")
-    print(match.examples)
+    log("Examples:")
+    log(match.examples)
 
     for i, sample in enumerate(test_set):
-        header(f"Test {i + 1}")
-        header("Input")
+        log(header(f"Test {i + 1}"))
+        log(header("Input"))
 
         source, target = sample["source"], sample["target"]
         true_corresp = sample["correspondence"]
-        print(match.format_input(source, target))
+        log(match.format_input(source, target))
 
         pred_corresp = match.invoke(
             source_schema=source,
@@ -54,14 +55,14 @@ def run(match, test_set):
         is_correct = pred_corresp == true_corresp
         match_correct.append(is_correct)
 
-        header("Prediction")
-        print(f"True: ", true_corresp)
-        print(f"Pred: ", pred_corresp)
+        log(header("Prediction"))
+        log(f"True: {true_corresp}")
+        log(f"Pred: {pred_corresp}")
 
-        header("Stats")
-        print(f"{'Correct' if is_correct else 'Incorrect'}")
-        print(f"Latency: {match.latencies[-1]}")
-        print(f"Token_count: {match.token_counts[-1]}")
+        log(header("Stats"))
+        log(f"{'Correct' if is_correct else 'Incorrect'}")
+        log(f"Latency: {match.latencies[-1]}")
+        log(f"Token_count: {match.token_counts[-1]}")
 
     summary = {
         "match_correct": match_correct,
@@ -75,9 +76,9 @@ def run(match, test_set):
         "avg_latency": np.mean(match.latencies),
     }
 
-    header("Summary")
-    pp.pprint(summary)
-    pp.pprint(stats)
+    log(header("Summary"))
+    log(summary, pretty=True)
+    log(stats, pretty=True)
 
     return stats, summary
 
@@ -121,11 +122,16 @@ def benchmark_vary_shot(
     Returns:
     - Prints the benchmark results.
     """
+    init_logger(
+        log_file=os.path.join(__log_dir__, "vary_shot.log"),
+        add_timestamp=True
+    )
+    log(f"Setup: {locals()}")
 
     # Prepare dataset
     train_set, test_set = prepare_dataset(filepath, test_size)
     assert len(test_set) > num_test, "Number of test samples is greater than the actual test set size."
-    print(f"train size {len(train_set)}, test size {len(test_set)}")
+    log(f"train size {len(train_set)}, test size {len(test_set)}")
 
     # Initialize benchmark results containers
     all_stats = {}
@@ -133,7 +139,7 @@ def benchmark_vary_shot(
 
     # Run the benchmark
     for num_shot in range(0, num_max_shot + 1):
-        header(f"Running for {num_shot} shots", char="=")
+        log(header(f"Running for {num_shot} shots", char="="))
 
         # Initialize matching method with current shot
         match = match_method(
@@ -149,13 +155,13 @@ def benchmark_vary_shot(
         token_count += sum(summary["token_counts"])
 
     # Print summary of benchmarks
-    header("Benchmark summary", char="=")
-    pp.pprint({
+    log(header("Benchmark summary", char="="))
+    log({
         "Accuracy": {num_shot: stats["accuracy"] for num_shot, stats in all_stats.items()},
         "Avg token count": {num_shot: stats["avg_token_count"] for num_shot, stats in all_stats.items()},
         "Avg latency": {num_shot: stats["avg_latency"] for num_shot, stats in all_stats.items()},
         "Total tokens used": token_count
-    })
+    }, pretty=True)
 
 
 def main():
