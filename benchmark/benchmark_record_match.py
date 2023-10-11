@@ -5,27 +5,15 @@ import numpy as np
 
 from llmint.extract import from_mint_sample
 from llmint.match.record import RecordChatMatch
-from llmint.match.util import diff_corresp
+import llmint.match.util as match_util
 
 __dir__ = os.path.dirname(__file__)
-__log_dir__= os.path.join(__dir__, "logs")
+__log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
     "device", "flat_light.yaml"
 )
-
-
-def format_output(prediction):
-    """Convert the prediction format to match the desired ground-truth format."""
-    formatted_predictions = []
-    for i in range(0, len(prediction), 3):
-        entry = {
-            pred.split(": ")[0].replace("'", "").strip(): pred.split(": ")[1].replace("'", "").strip()
-            for pred in prediction[i:i + 3]
-        }
-        formatted_predictions.append(entry)
-    return formatted_predictions
 
 
 def run(match, test_set):
@@ -49,7 +37,7 @@ def run(match, test_set):
 
         # validate the prediction
         try:
-            pred_corresp = format_output(pred_corresp)
+            pred_corresp = match_util.format_output(pred_corresp)
         except:
             pass
         is_correct = pred_corresp == true_corresp
@@ -63,11 +51,9 @@ def run(match, test_set):
         log(f"{'Correct' if is_correct else 'Incorrect'}")
         if not is_correct:
             log(header("Diff"))
-            log(diff_corresp(true_corresp, pred_corresp))
+            log(match_util.diff_corresp(true_corresp, pred_corresp))
         log(f"Latency: {match.latencies[-1]}")
         log(f"Token_count: {match.token_counts[-1]}")
-
-
 
     summary = {
         "match_correct": match_correct,
@@ -88,17 +74,6 @@ def run(match, test_set):
     return stats, summary
 
 
-def prepare_dataset(filepath, test_size):
-    # Load data
-    data = util.from_yaml(filepath)
-
-    # Extract samples
-    samples = list(from_mint_sample.read_corresp(data))
-    train_set, test_set = util.train_test_split(samples, test_size=test_size)
-
-    return train_set, test_set
-
-
 def benchmark_vary_shot(
         # dataset params
         filepath=default_dataset,
@@ -109,7 +84,7 @@ def benchmark_vary_shot(
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
-        num_max_shot=1,
+        num_max_shot=3,
         num_test=2,
 ):
     """
@@ -134,7 +109,11 @@ def benchmark_vary_shot(
     log(f"Setup: {locals()}")
 
     # Prepare dataset
-    train_set, test_set = prepare_dataset(filepath, test_size)
+    data = util.from_yaml(filepath)
+    # XXX detect sample type
+    samples = list(from_mint_sample.read_corresp(data))
+    train_set, test_set = util.train_test_split(samples, test_size=test_size)
+
     assert len(test_set) > num_test, "Number of test samples is greater than the actual test set size."
     log(f"train size {len(train_set)}, test size {len(test_set)}")
 

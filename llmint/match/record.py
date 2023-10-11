@@ -13,10 +13,18 @@ from llmint import mint_utils
 
 
 class RecordMatch(ABC):
-    def __init__(self, examples=None, model="gpt-3.5-turbo", temperature=0.0):
+    def __init__(
+            self,
+            examples=None,
+            model="gpt-3.5-turbo",
+            temperature=0.0,
+            verbose=True,
+    ):
         self.examples = examples or []
-        self.temperature = temperature
         self.model = model
+        self.temperature = temperature
+        self.verbose = verbose
+
         self.chain, self.prompt = self.prepare()
         self.token_counts = []
         self.latencies = []
@@ -75,8 +83,9 @@ class RecordChatMatch(RecordMatch):
 
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "You are performing schema matching to identify the "
-                           "correspondences of fields between a source and a target schemas."),
+                ("system", "You are performing schema mapping to identify the "
+                           "correspondences and conversion of fields between "
+                           "a source and a target schemas."),
                 few_shot_prompt,
                 ("human", "{input_message}")
             ]
@@ -85,16 +94,17 @@ class RecordChatMatch(RecordMatch):
         chain = LLMChain(
             llm=ChatOpenAI(
                 openai_api_key=mint_utils.get_openai_key(),
-                temperature=self.temperature
+                temperature=self.temperature,
             ),
             prompt=prompt,
-            output_parser=mint_utils.CommaSeparatedListOutputParser()
+            output_parser=mint_utils.CommaSeparatedListOutputParser(),
+            verbose=self.verbose,
         )
 
         return chain, prompt
 
     def format_input(self, source_schema, target_schema):
-        message = f"What are the correspondences " \
+        message = f"What are the schema mappings " \
                   f"between schema {source_schema} " \
                   f"and schema {target_schema}? " \
                   f"Answer using the same format as the example."
