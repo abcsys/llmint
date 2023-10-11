@@ -81,8 +81,8 @@ def benchmark_vary_shot(
         filepath=default_dataset,
         test_size=0.5,
         # match params
-        # model="gpt-3.5-turbo",
-        model="gpt-4",
+        model="gpt-3.5-turbo",
+        # model="gpt-4",
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
