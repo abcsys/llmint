@@ -95,5 +95,7 @@ class RecordChatMatch(RecordMatch):
 
     def format_input(self, source_schema, target_schema):
         message = f"What are the correspondences " \
-                  f"between {source_schema} and {target_schema}?"
+                  f"between schema {source_schema} " \
+                  f"and schema {target_schema}? " \
+                  f"Answer using the same format as the example."
         return {"input_message": message}

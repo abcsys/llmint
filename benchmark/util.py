@@ -38,18 +38,3 @@ def from_yaml(filepath):
     """Load a YAML file and return the data."""
     with open(filepath, 'r') as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
-
-
-def header(content, width=50, char="-", surround=(' ', ' ')) -> str:
-    """Format a print line with consistent width and centered content."""
-
-    # Surround the content with the given characters
-    content = f"{surround[0]}{content}{surround[1]}"
-
-    padding = width - len(content)
-    left_padding = padding // 2
-    right_padding = padding - left_padding
-
-    # construct the final string with the padding and content
-    formatted = f"{char * left_padding}{content}{char * right_padding}"
-    return formatted

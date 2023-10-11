@@ -1,11 +1,11 @@
 import os
 from benchmark import util
-from benchmark.util import header
-from benchmark.log import init_logger, log
+from benchmark.log import init_logger, log, header
 import numpy as np
 
 from llmint.extract import from_mint_sample
 from llmint.match.record import RecordChatMatch
+from llmint.match.util import diff_corresp
 
 __dir__ = os.path.dirname(__file__)
 __log_dir__= os.path.join(__dir__, "logs")
@@ -61,8 +61,13 @@ def run(match, test_set):
 
         log(header("Stats"))
         log(f"{'Correct' if is_correct else 'Incorrect'}")
+        if not is_correct:
+            log(header("Diff"))
+            log(diff_corresp(true_corresp, pred_corresp))
         log(f"Latency: {match.latencies[-1]}")
         log(f"Token_count: {match.token_counts[-1]}")
+
+
 
     summary = {
         "match_correct": match_correct,
@@ -100,6 +105,7 @@ def benchmark_vary_shot(
         test_size=0.5,
         # match params
         model="gpt-3.5-turbo",
+        # model="gpt-4",
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
@@ -112,12 +118,11 @@ def benchmark_vary_shot(
     Args:
     - filepath (str): Path to the dataset file. If not provided, defaults to a specified location.
     - test_size (float): Fraction of the dataset to be used for testing.
-    - num_max_shot (int): Maximum number of shots for the benchmark.
-    - num_test (int): Number of test samples to use. None for using all.
     - model (str): Model name.
     - temperature (float): Sampling temperature for the model.
-    - allowed_kinds (tuple): Allowed kinds of the dataset.
     - match_method (class or function): The matching method to use.
+    - num_max_shot (int): Maximum number of shots for the benchmark.
+    - num_test (int): Number of test samples to use. None for using all.
 
     Returns:
     - Prints the benchmark results.
