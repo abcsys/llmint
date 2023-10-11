@@ -3,18 +3,24 @@ Fast, adaptive, modular data integration toolchain powered by LLM.
 
 Given data from a data provider (source) and a data consumer (target):
 ```yaml
-source: { "status": "on", "brightness": 90 }
-target: { "power": "active", "luminosity": 0.9 }
+source: { "status": "on", "luminosity": 90 }
+target: { "power": "active", "brightness": 0.9 }
 ```
-We want to generate dataflow operators that convert data from the source schema to the target schema, given information about the data source and the data consumer, with a process we refer to as *mint*. 
+We want to generate dataflow operators that convert data from the source schema to the target schema, e.g., in [Zed](https://github.com/brimdata/zed) dataflow:
 
 ```shell
-rename power := status | rename luminosity := brightness | switch power ("on" => power := "active" "off" => power := "inactive")
+rename power := status | rename brightness := luminosity | switch power ( case "on" => power := "active" case "off" => power := "inactive") | brightness := brightness / 100.0
 ```
 
+..given the information about the data source and the target.
 
+> TBD We assume the following *minimum* pieces of information are available at the data source and the target: at least one sample data record. The data record should contain at least partial schema information (e.g. a data record in json). 
+>
+> Llmint will leverage any additional information to improve the accuracy of mint whenever possible. Commonly available information at data source and target: (i) Description about the data source (e.g. "smart light " for the above example); (ii) Schema information (e.g., data type, default values, required or optional, data ranges, description about each field); (iii) Additional data samples.
+>
+> Note that llmint is designed to handle cases where maintaining the additional information about the data sources are tedious. 
 
-A mint operation consists of the following stages.
+We refer to this process as *mint*.  A mint operation consists of the following stages.
 
 **S1: Discovery.** Identifying the data sources that are relevant to a data consumer based on the *intent* at the data consumer and the data source's *metadata* such as text description. This stage helps scope down the semantics of the desired schema and can be seen as a pre-filtering step. Data consumer can also use this step to select known data sources.
 
@@ -22,11 +28,17 @@ A mint operation consists of the following stages.
 
 **S3: Identification.** Given the source and target MRs this stage (i) preprocesses them to generate normalized MRs which are invariant to field ordering, capitalization etc; (ii) decides whether the source-target schema pair has been seen before. If so, skip the following steps and return any cached correspondences or mappings.
 
-**S4: Matching.** Find the correspondences between fields in the schemas. This step generates the correspondence between fields. Each correspondence contains a language-neutral transformation between the values and can be seen as a row of a match-action table. The process Decides whether the schemas are semantically equivalent and/or having semantically equivalent fields, depending on the pre-filtering policy.
+**S4: Matching.** Find the correspondences between fields in the schemas. This step generates the correspondence between fields. The process also decides whether the schemas are semantically equivalent and/or having semantically equivalent fields, depending on the pre-filtering policy.
 
-**S5: Mapping.** Generates dataflow that coverts fields from source schema to the target schema, given the correspondences. The dataflow language can be specified by the user.
+**S5: Mapping.** Given each correspondence, this step generates a language-neutral transformation between the values and can be seen as a row of a match-action table. 
 
-S1-S3 are referred to as the frontend which extracts source schema from desired data sources. S4-S5 are referred to as the backend.  The mapping dataflow can be installed on the data pipeline or used in a query.
+**S6: Assembly.** Generates dataflow that coverts fields from source schema to the target schema, given the correspondences. The dataflow language can be specified by the user.
+
+S1-S3 are referred to as the frontend which extracts source schema from desired data sources. S4-S6 are referred to as the backend.  The mapping dataflow can be installed on the data pipeline or used in a query. 
+
+The key piece of design of limit is that each step will leverage as much as data from the data source and the other steps as possible. For example, the mapping stage will not only reuse the correspondences from the matching stage, but it will also look at the source data when it is available.
+
+> TBD We use a technique called *retrospection* which we asks the LLM to go through the generated correspondence to check each field for correctness and tracks any mistakes that we'll use for prompting in the future or rerun the generation at hand. We build this separate module as *retrospect* which can be attached to either of the stages, not only the matching stage.
 
 ## Design
 
@@ -36,11 +48,7 @@ Llmint focuses on three objectives: accuracy, performance, and cost.
 >
 > Our first approach is provide an interface allowing predefine rules that specify what happens if we see schema that matches known structures and which actions to perform. At run-time, the rules and the schemas of the source and target are given as input to generate the dataflow and prepended to the data pipeline.
 >
-> 
->
 > The goal is to achieve a fast, programmable data integration pipeline.
-
-
 
 **Accuracy.** 
 
@@ -61,17 +69,18 @@ Llmint exposes the high-level modules with a declarative interface.
 ```python
 import llmint
 mint = llmint.new_mint()
-corr = mint.
 ```
 
+> Difficult cases. 1. Same filed names but refer to different entities. 2. Range differences. 3. Data nested.
 
-
-Difficult cases. 1. Same filed names but refer to different entities. 2. Range differences. 3. Data nested.
-
-
+> TBD not all examples are useful - stateful matching with example selection to improve accuracy and reduce tokens
 
 ## FAQ
 
 > Why not dump all data to LLM and let it generate results?
 
 Structured queries over time series data can be done more efficiently (fast and less costs) with dataflow engines. 
+
+> Data integration is hard. How does LLM help solve the problem?
+
+Here are a few intuitions on why the approach works for some domains. In IoT, for example, here are a few characteristics. (i) Simple schemas. In IoT, for example, the data source generates continuous stream of data records. (ii) Large volume of data. (iii) Description of the data source.
