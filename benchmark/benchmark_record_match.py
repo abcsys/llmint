@@ -88,6 +88,7 @@ def benchmark_vary_shot(
         max_num_shot=1,
         num_test=5,
         verbose=True,
+        seed=1,
 ):
     """
     Run a benchmark test on a device dataset with varying shots.
@@ -113,10 +114,10 @@ def benchmark_vary_shot(
     # Prepare dataset
     data = util.from_yaml(filepath)
     # XXX detect sample type
-    samples = list(from_mint_sample.read_corresp(data))
-    train_set, test_set = util.train_test_split(samples, test_size=test_size)
+    samples = list(from_mint_sample.read_match(data))
+    train_set, test_set = util.train_test_split(samples, test_size=test_size, seed=seed)
 
-    assert len(test_set) > num_test, "Number of test samples is greater than the actual test set size."
+    assert len(test_set) >= num_test, "Number of test samples is greater than the actual test set size."
     log(f"train size {len(train_set)}, test size {len(test_set)}")
 
     # Initialize benchmark results containers

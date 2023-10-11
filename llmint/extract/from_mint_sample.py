@@ -1,19 +1,20 @@
 from typing import Dict, Tuple, Generator, List
 
 
-def read_corresp(input_data: Dict[str, List[Dict]],
-                 match_only: bool = False) -> Generator:
+def read_mapping(input_data: Dict[str, List[Dict]]) -> Generator:
     """
     Generate samples from the given input_data. If allowed_kinds is provided,
     only those kinds will be used.
 
-    Each sample contains 'kind', 'source', 'target', and 'correspondence'.
+    Each sample contains 'kind', 'source', 'target', and 'mapping'.
 
     Parameters:
     - input_data: A dictionary with kinds as keys and lists of rows as values.
 
     Yields:
-    - A dictionary containing 'kind', 'source', 'target', and 'correspondence'.
+    - A dictionary containing 'kind', 'source', 'target', and 'mapping'.
+
+    Each mapping is a dictionary containing 'from', 'to', and 'transformation'.
     """
     for kind, rows in input_data.items():
         for row in rows:
@@ -21,15 +22,20 @@ def read_corresp(input_data: Dict[str, List[Dict]],
                 "kind": kind,
                 "source": row["source"],
                 "target": row["target"],
-                "correspondence": row["correspondence"],
+                "mapping": row["mapping"],
             }
 
 
-def match_only(correspondence: Dict):
-    """
-    Keep only match in a correspondence.
-    """
-    return {
-        "from": correspondence["from"],
-        "to": correspondence["to"],
-    }
+def read_match(input_data: Dict[str, List[Dict]]) -> Generator:
+    for kind, rows in input_data.items():
+        for row in rows:
+            yield {
+                "kind": kind,
+                "source": row["source"],
+                "target": row["target"],
+                "correspondence": [
+                    {"from": mapping["from"],
+                     "to": mapping["to"]}
+                    for mapping in row["mapping"]
+                ],
+            }

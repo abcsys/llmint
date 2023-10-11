@@ -82,6 +82,8 @@ mint = llmint.new_mint()
 > TBD Deducting mapping from the values.
 >
 > TBD Stored mappings for HSBK and RGB.
+>
+> TBD Semantic handshaking 
 
 ## FAQ
 
