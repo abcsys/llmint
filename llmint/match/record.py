@@ -18,7 +18,7 @@ class RecordMatch(ABC):
             examples=None,
             model="gpt-3.5-turbo",
             temperature=0.0,
-            verbose=True,
+            verbose=False,
     ):
         self.examples = examples or []
         self.model = model

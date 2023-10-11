@@ -14,7 +14,9 @@ rename power := status | rename brightness := luminosity | switch power ( case "
 
 ..given the information about the data source and the target.
 
-> TBD We assume the following *minimum* pieces of information are available at the data source and the target: at least one sample data record. The data record should contain at least partial schema information (e.g. a data record in json). 
+> TBD We assume the following *minimum* pieces of information are available at the data source and the target: at least one sample data record from each. The data record should contain at least partial schema information (e.g. a data record in json). 
+>
+> Note: unlike what's in the above example, the data records from the source and target may not correspond to the same entity and may be semantically different.
 >
 > Llmint will leverage any additional information to improve the accuracy of mint whenever possible. Commonly available information at data source and target: (i) Description about the data source (e.g. "smart light " for the above example); (ii) Schema information (e.g., data type, default values, required or optional, data ranges, description about each field); (iii) Additional data samples.
 >
@@ -73,7 +75,13 @@ mint = llmint.new_mint()
 
 > Difficult cases. 1. Same filed names but refer to different entities. 2. Range differences. 3. Data nested.
 
-> TBD not all examples are useful - stateful matching with example selection to improve accuracy and reduce tokens
+> TBD Example selection. Since it's unlikely that all examples are equally useful, llmint allows stateful matching with example selection to improve accuracy and reduce tokens
+
+> TBD Completion model.
+>
+> TBD Deducting mapping from the values.
+>
+> TBD Stored mappings for HSBK and RGB.
 
 ## FAQ
 

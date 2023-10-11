@@ -84,8 +84,10 @@ def benchmark_vary_shot(
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
-        num_max_shot=3,
-        num_test=2,
+        min_num_shot=1,
+        max_num_shot=1,
+        num_test=5,
+        verbose=True,
 ):
     """
     Run a benchmark test on a device dataset with varying shots.
@@ -122,7 +124,7 @@ def benchmark_vary_shot(
     token_count = 0
 
     # Run the benchmark
-    for num_shot in range(0, num_max_shot + 1):
+    for num_shot in range(min_num_shot, max_num_shot + 1):
         log(header(f"Running for {num_shot} shots", char="="))
 
         # Initialize matching method with current shot
@@ -130,6 +132,7 @@ def benchmark_vary_shot(
             examples=train_set[:num_shot],
             model=model,
             temperature=temperature,
+            verbose=verbose,
         )
 
         # Evaluate the current shot
