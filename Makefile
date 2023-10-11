@@ -8,4 +8,4 @@ install:
 
 .PHONY: test
 test:
-	python -m benchmark.benchmark_simple_match
+	python -m benchmark.benchmark_record_match

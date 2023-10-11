@@ -1,6 +1,10 @@
-# class Correspondence
+class Correspondence:
+    """
+    Correspondence of fields between two schemas.
+    """
+
 
 __all__ = [
     'util',
-    'simple'
+    'record.py'
 ]
