@@ -14,7 +14,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "device", "flat_light_varied_value.yaml"
+    "device", "flat.yaml"
 )
 
 
@@ -80,15 +80,15 @@ def run(match, test_set):
 def benchmark_vary_shot(
         # dataset params
         filepath=default_dataset,
-        test_size=0.5,
+        test_size=0.75,
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
         match_method=RecordChatMatch,
         # benchmark params
-        min_num_shot=1,
-        max_num_shot=1,
-        num_test=5,
+        min_num_shot=0,
+        max_num_shot=2,
+        num_test=10,
         verbose=True,
         seed=42,
 ):

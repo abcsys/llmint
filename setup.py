@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="llmint",
-    version="0.0.1",
+    version="0.0.2",
     description="Llmint python library",
-    author="silveryfu",
+    author="Llmint Team",
     author_email="silveryfu@gmail.com",
     license="Apache License, Version 2.0",
     packages=find_packages(exclude=("tests",)),

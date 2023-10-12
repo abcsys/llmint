@@ -162,3 +162,4 @@ cython_debug/
 # llmint
 benchmark/logs
 
+.DS_Store

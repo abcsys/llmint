@@ -76,14 +76,14 @@ def run(mapper, test_set):
 def benchmark_vary_shot(
         # dataset params
         filepath=default_dataset,
-        test_size=0.5,
+        test_size=0.75,
         # match params
         model="gpt-3.5-turbo",
         temperature=0.0,
         match_method=RecordChatMapper,
         # benchmark params
-        min_num_shot=1,
-        max_num_shot=1,
+        min_num_shot=0,
+        max_num_shot=2,
         num_test=5,
         verbose=True,
         seed=42,
