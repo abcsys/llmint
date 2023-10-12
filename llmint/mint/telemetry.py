@@ -37,6 +37,16 @@ class Telemetry:
     def stats(self):
         """Returns the telemetry statistics."""
         return {
+            'total_tokens': self.total_tokens,
+            'prompt_tokens': self.prompt_tokens,
+            'completion_tokens': self.completion_tokens,
+            'total_costs': self.total_costs,
+            'latencies': self.latencies,
+        }
+
+    def summary(self):
+        """Returns the summary of telemetry statistics."""
+        return {
             'avg_tokens': np.mean(self.total_tokens),
             'avg_prompt_tokens': np.mean(self.prompt_tokens),
             'avg_completion_tokens': np.mean(self.completion_tokens),
@@ -71,7 +81,7 @@ def test():
         with telemetry.report(cb):
             print(llm("Hello!", temperature=0.1))
 
-    pp.pprint(telemetry.stats())
+    pp.pprint(telemetry.summary())
 
 
 if __name__ == '__main__':

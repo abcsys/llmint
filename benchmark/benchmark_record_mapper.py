@@ -3,11 +3,10 @@ from benchmark import util
 from benchmark.log import (
     init_logger, log_name, log, header
 )
-import numpy as np
 
 from llmint.extract import from_mint_sample
-from llmint.match.record import RecordChatMatch
-import llmint.match.util as match_util
+from llmint.mapper.record import RecordChatMapper
+import llmint.mapper.output as output_util
 
 __dir__ = os.path.dirname(__file__)
 __log_dir__ = os.path.join(__dir__, "logs")
@@ -18,61 +17,58 @@ default_dataset = os.path.join(
 )
 
 
-# TBD: refactor this to use the Match base class
-def run(match, test_set):
-    match_correct = []
+def run(mapper, test_set):
+    map_correct = []
 
     log("Examples:")
-    log(match.examples)
+    log(mapper.examples)
 
     for i, sample in enumerate(test_set):
         log(header(f"Test {i + 1}"))
         log(header("Input"))
 
         source, target = sample["source"], sample["target"]
-        true_corresp = sample["correspondence"]
-        log(match.format_input(source, target))
+        true_mapping = sample["mapping"]
+        log(mapper.format_input(source, target))
 
-        pred_corresp = match.invoke(
+        pred_mapping = mapper.invoke(
             source_schema=source,
             target_schema=target,
         )["text"]
 
         # validate the prediction
         try:
-            pred_corresp = match_util.format_output(pred_corresp)
+            pred_mapping = output_util.format_output(pred_mapping)
         except:
             pass
-        is_correct = pred_corresp == true_corresp
-        match_correct.append(is_correct)
+        is_correct = pred_mapping == true_mapping
+        map_correct.append(is_correct)
 
         log(header("Prediction"))
-        log(f"True: {true_corresp}")
-        log(f"Pred: {pred_corresp}")
+        log(f"True: {true_mapping}")
+        log(f"Pred: {pred_mapping}")
 
         log(header("Stats"))
         log(f"{'Correct' if is_correct else 'Incorrect'}")
         if not is_correct:
             log(header("Diff"))
-            log(match_util.diff_corresp(true_corresp, pred_corresp))
-        log(f"Latency: {match.latencies[-1]}")
-        log(f"Token_count: {match.token_counts[-1]}")
+            log(output_util.diff_mapping(true_mapping, pred_mapping))
+        log(f"Latency: {mapper.telemetry.latencies[-1]}")
+        log(f"Token_count: {mapper.telemetry.total_tokens[-1]}")
 
-    summary = {
-        "match_correct": match_correct,
-        "token_counts": match.token_counts,
-        "latencies": match.latencies,
-    }
     stats = {
-        "total": len(match_correct),
-        "accuracy": sum(match_correct) / len(match_correct),
-        "avg_token_count": np.mean(match.token_counts),
-        "avg_latency": np.mean(match.latencies),
+        "map_correct": map_correct,
+        **mapper.telemetry.stats(),
+    }
+    summary = {
+        "total": len(map_correct),
+        "accuracy": sum(map_correct) / len(map_correct),
+        **mapper.telemetry.summary(),
     }
 
     log(header("Summary"))
-    log(summary, pretty=True)
     log(stats, pretty=True)
+    log(summary, pretty=True)
 
     return stats, summary
 
@@ -82,9 +78,9 @@ def benchmark_vary_shot(
         filepath=default_dataset,
         test_size=0.5,
         # match params
-        model="gpt-3.5-turbo", # "gpt-4"
+        model="gpt-3.5-turbo",
         temperature=0.0,
-        match_method=RecordChatMatch,
+        match_method=RecordChatMapper,
         # benchmark params
         min_num_shot=1,
         max_num_shot=1,
@@ -118,14 +114,14 @@ def benchmark_vary_shot(
     # Prepare dataset
     data = util.from_yaml(filepath)
     # XXX detect sample type
-    samples = list(from_mint_sample.read_match(data))
+    samples = list(from_mint_sample.read_mapping(data))
     train_set, test_set = util.train_test_split(samples, test_size=test_size, seed=seed)
 
     assert len(test_set) >= num_test, "Number of test samples is greater than the actual test set size."
     log(f"train size {len(train_set)}, test size {len(test_set)}")
 
     # Initialize benchmark results containers
-    all_stats = {}
+    all_summaries = {}
     token_count = 0
 
     # Run the benchmark
@@ -133,7 +129,7 @@ def benchmark_vary_shot(
         log(header(f"Running for {num_shot} shots", char="="))
 
         # Initialize matching method with current shot
-        match = match_method(
+        mapper = match_method(
             examples=train_set[:num_shot],
             model=model,
             temperature=temperature,
@@ -141,17 +137,17 @@ def benchmark_vary_shot(
         )
 
         # Evaluate the current shot
-        stats, summary = run(match, test_set[:num_test])
+        stats, summary = run(mapper, test_set[:num_test])
 
-        all_stats[num_shot] = stats
-        token_count += sum(summary["token_counts"])
+        all_summaries[num_shot] = summary
+        token_count += summary["total_tokens"]
 
     # Print summary of benchmarks
     log(header("Benchmark summary", char="="))
     log({
-        "Accuracy": {num_shot: stats["accuracy"] for num_shot, stats in all_stats.items()},
-        "Avg token count": {num_shot: stats["avg_token_count"] for num_shot, stats in all_stats.items()},
-        "Avg latency": {num_shot: stats["avg_latency"] for num_shot, stats in all_stats.items()},
+        "Accuracy": {num_shot: summary["accuracy"] for num_shot, summary in all_summaries.items()},
+        "Avg token count": {num_shot: summary["avg_tokens"] for num_shot, summary in all_summaries.items()},
+        "Avg latency": {num_shot: summary["avg_latency"] for num_shot, summary in all_summaries.items()},
         "Total tokens used": token_count
     }, pretty=True)
 

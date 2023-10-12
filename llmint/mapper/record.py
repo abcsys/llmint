@@ -2,66 +2,19 @@
 Simple zero to few-shot mapping.
 """
 
-import time
-from abc import ABC
-from abc import abstractmethod
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import FewShotChatMessagePromptTemplate, ChatPromptTemplate
 from langchain.chains import LLMChain
-from langchain.callbacks import get_openai_callback
 from llmint import mint_utils
+from llmint.mapper import Mapper
 
 
-class RecordMap(ABC):
-    def __init__(
-            self,
-            examples=None,
-            model="gpt-3.5-turbo",
-            temperature=0.0,
-            verbose=False,
-    ):
-        self.examples = examples or []
-        self.model = model
-        self.temperature = temperature
-        self.verbose = verbose
-
-        self.chain, self.prompt = self.prepare()
-        self.token_counts = []
-        self.latencies = []
-
-    @abstractmethod
-    def prepare(self) -> (LLMChain, str):
-        """
-        Prepares the prompt and LLMChain.
-        """
-        pass
-
-    @abstractmethod
-    def format_input(self, source_schema, target_schema) -> dict:
-        pass
-
-    def invoke(self, source_schema, target_schema):
-        """
-        Invokes the LLMChain for schema matching.
-
-        Args:
-        - source: The source schema.
-        - target: The target schema.
-
-        Returns:
-        Mappings between the source and target.
-        """
-        input = self.format_input(source_schema, target_schema)
-
-        with get_openai_callback() as cb:
-            start = time.time()
-            output_message = self.chain.invoke(input)
-            self.token_counts.append(cb.total_tokens)
-            self.latencies.append(time.time() - start)
-        return output_message
+class RecordMapper(Mapper):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
-class RecordChatMap(RecordMap):
+class RecordChatMapper(RecordMapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -84,7 +37,7 @@ class RecordChatMap(RecordMap):
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "You are performing schema mapping to identify the "
-                           "mappings and conversion of fields between "
+                           "correspondences of fields and their transformations between "
                            "a source and a target schemas."),
                 few_shot_prompt,
                 ("human", "{input_message}")

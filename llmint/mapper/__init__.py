@@ -3,8 +3,8 @@ from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
 from llmint.mint.telemetry import Telemetry
 
-# TBD switch RecordMatch to Match base class
-class Match():
+
+class Mapper:
     def __init__(
             self,
             examples=None,
@@ -33,14 +33,14 @@ class Match():
 
     def invoke(self, source_schema, target_schema):
         """
-        Invokes the LLMChain for schema matching.
+        Invokes the LLMChain for schema mapping.
 
         Args:
         - source: The source schema.
         - target: The target schema.
 
         Returns:
-        Correspondences between the source and target.
+        Mappings between the source and target.
         """
         input = self.format_input(source_schema, target_schema)
 
@@ -49,8 +49,8 @@ class Match():
                 output_message = self.chain.invoke(input)
         return output_message
 
-
 __all__ = [
-    'util',
-    'record'
+    'record',
+    'schema',
+    'output',
 ]
