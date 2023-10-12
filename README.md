@@ -86,7 +86,7 @@ mint = llmint.new_mint()
 
 > TBD Support additional rules as part of examples
 
-> TBD Semantic handshaking 
+> TBD Small model async access
 
 ## FAQ
 
