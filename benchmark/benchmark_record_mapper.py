@@ -13,7 +13,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "device", "flat_light_varied_value.yaml"
+    "record", "flat_light_varied_value.yaml"
 )
 
 

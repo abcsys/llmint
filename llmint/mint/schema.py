@@ -1,0 +1,3 @@
+"""
+Llmint internal schema definition.
+"""

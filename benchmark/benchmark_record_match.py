@@ -14,7 +14,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "device", "flat.yaml"
+    "record", "flat.yaml"
 )
 
 
