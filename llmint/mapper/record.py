@@ -7,6 +7,7 @@ from langchain.prompts import FewShotChatMessagePromptTemplate, ChatPromptTempla
 from langchain.chains import LLMChain
 from llmint import mint_utils
 from llmint.mapper import Mapper
+from llmint.mapper.output import format_output
 
 
 class RecordMapper(Mapper):
@@ -46,7 +47,7 @@ class RecordChatMapper(RecordMapper):
 
         chain = LLMChain(
             llm=ChatOpenAI(
-                openai_api_key=mint_utils.get_openai_key(),
+                openai_api_key=mint_utils.get_openai_api_key(),
                 temperature=self.temperature,
             ),
             prompt=prompt,
@@ -62,3 +63,7 @@ class RecordChatMapper(RecordMapper):
                   f"and schema {target_schema}? " \
                   f"Answer using the same format as the example."
         return {"input_message": message}
+
+    def format_output(self, output):
+        return format_output(output)
+       

@@ -92,7 +92,7 @@ class RecordChatMatch(RecordMatch):
 
         chain = LLMChain(
             llm=ChatOpenAI(
-                openai_api_key=mint_utils.get_openai_key(),
+                openai_api_key=mint_utils.get_openai_api_key(),
                 temperature=self.temperature,
             ),
             prompt=prompt,

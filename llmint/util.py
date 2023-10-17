@@ -5,8 +5,7 @@ from langchain.schema import BaseOutputParser
 
 
 # Read OpenAI key from ~/.llmint/config.yaml
-# XXX rename to get_openai_api_key
-def get_openai_key():
+def get_openai_api_key():
     with open(os.path.expanduser("~/.llmint/config.yaml"), "r") as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
         if "openai_api_key" not in config:

@@ -40,7 +40,7 @@ Schema: Smart_light
 - Description: Sample schema for a smart light
 
 Fields:
-- Name: switch
+- Name: power
   Type: Enum
   Range: ["on", "off"]
 
@@ -77,7 +77,7 @@ Fields:
 """
 
 import yaml
-from typing import Any, List, Union, Optional, Dict
+from typing import Any, List, Optional, Dict
 
 
 # Base Field definition class
@@ -91,7 +91,7 @@ class Field:
                  required: Optional[bool] = False,
                  default: Optional[Any] = None,
                  example: Optional[Any] = None,
-                 subfields: Optional[List['Field']] = None):
+                 fields: Optional[List['Field']] = None):
         """Constructor for Field class."""
         self.name = name
         self.type_ = type_
@@ -99,7 +99,7 @@ class Field:
         self.required = required
         self.default = default
         self.example = example
-        self.subfields = subfields
+        self.fields = fields
 
 
 # Specific Field Types
@@ -198,7 +198,7 @@ class Schema:
             elif field_type == "dict":
                 # Handle nested records
                 nested_fields = Schema._recursive_extract(value)
-                fields.append(Field(name=key, type_="object", subfields=nested_fields))
+                fields.append(Field(name=key, type_="object", fields=nested_fields))
 
         return fields
 
@@ -225,8 +225,8 @@ class Schema:
             if isinstance(field, ArrayField):
                 result['element_type'] = field.element_type
 
-            if field.subfields:
-                result['subfields'] = [field_to_dict(subfield) for subfield in field.subfields]
+            if field.fields:
+                result['fields'] = [field_to_dict(field) for field in field.fields]
 
             # Place min and max at the end
             if isinstance(field, IntegerField) or isinstance(field, FloatField):
