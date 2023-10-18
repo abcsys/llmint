@@ -2,15 +2,12 @@
 Simple zero to few-shot matching.
 """
 
-import time
-from abc import ABC
-from abc import abstractmethod
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import FewShotChatMessagePromptTemplate, ChatPromptTemplate
 from langchain.chains import LLMChain
 from llmint import mint_utils
 from llmint.match.util import format_output
-from langchain.callbacks import get_openai_callback
+from llmint.match import Match
 
 
 
