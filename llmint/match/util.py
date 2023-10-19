@@ -30,3 +30,11 @@ def format_output(raw_output):
     split_pairs = [item.split(": ")[1].strip("'") for item in raw_output]
     # Create dictionaries in pairs of two items
     return [{'from': split_pairs[i], 'to': split_pairs[i + 1]} for i in range(0, len(split_pairs), 2)]
+
+def pt_format_output(raw_output):
+    """Convert the prediction format to match the desired ground-truth format."""
+    # Split strings by ': ' to get key-value pairs
+    split_pairs = [item.split(": ")[1].strip('"').strip("'") for item in raw_output]
+    print("SPLIT PAIRS: ", split_pairs)
+    # Create dictionaries in pairs of two items
+    return [{'from': split_pairs[i], 'to': split_pairs[i + 1]} for i in range(0, len(split_pairs), 3)]

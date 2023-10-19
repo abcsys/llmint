@@ -6,7 +6,7 @@ from benchmark.log import (
 import numpy as np
 
 from llmint.extract import from_mint_sample
-from llmint.match.record import RecordChatMatch
+from llmint.match.record import RecordChatMatch, RecordPromptMatch
 import llmint.match.util as match_util
 
 __dir__ = os.path.dirname(__file__)
@@ -37,10 +37,12 @@ def run(match, test_set):
             source_schema=source,
             target_schema=target,
         )["text"]
+        
+        print("RAW PREDICTION: ", pred_corresp)
 
         # validate the prediction
         try:
-            pred_corresp = match_util.format_output(pred_corresp)
+            pred_corresp = match_util.pt_format_output(pred_corresp)
         except:
             pass
         is_correct = pred_corresp == true_corresp
@@ -82,9 +84,9 @@ def benchmark_vary_shot(
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
-        match_method=RecordChatMatch,
+        match_method=RecordPromptMatch,
         # benchmark params
-        min_num_shot=0,
+        min_num_shot=1,
         max_num_shot=2,
         num_test=10,
         verbose=True,
@@ -131,8 +133,16 @@ def benchmark_vary_shot(
         log(header(f"Running for {num_shot} shots", char="="))
 
         # Initialize matching method with current shot
+        debug_examples = [
+            {
+                "source": """{{ "light": "on", "brightness": 100, "color": "red", "mode": "day" }}""",
+                "target": """{{ "power": "active", "brightness": 1, "color": "red", "mode": "day" }}""",
+                "correspondence": """{{ "from": "light", "to": "power", "transformation": "rename on active" }}, {{ "from": "brightness", "to": "brightness", "transformation": "X / 100" }}, {{ "from": "color", "to": "color", "transformation": "" }}, {{ "from": "mode", "to": "mode", "transformation": "" }}"""
+            }
+        ]
         match = match_method(
-            examples=train_set[:num_shot],
+            examples=debug_examples,
+            #examples=train_set[:num_shot],
             model=model,
             temperature=temperature,
             verbose=verbose,
