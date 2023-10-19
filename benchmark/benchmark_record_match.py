@@ -55,24 +55,22 @@ def run(match, test_set):
         if not is_correct:
             log(header("Diff"))
             log(match_util.diff_corresp(true_corresp, pred_corresp))
-        log(f"Latency: {match.latencies[-1]}")
-        log(f"Token_count: {match.token_counts[-1]}")
+        log(f"Latency: {match.telemetry.latencies[-1]}")
+        log(f"Token_count: {match.telemetry.total_tokens[-1]}")
 
-    summary = {
-        "match_correct": match_correct,
-        "token_counts": match.token_counts,
-        "latencies": match.latencies,
-    }
     stats = {
+        "match_correct": match_correct,
+        **match.telemetry.stats(),
+    }
+    summary = {
         "total": len(match_correct),
         "accuracy": sum(match_correct) / len(match_correct),
-        "avg_token_count": np.mean(match.token_counts),
-        "avg_latency": np.mean(match.latencies),
+        **match.telemetry.summary(),
     }
 
     log(header("Summary"))
-    log(summary, pretty=True)
     log(stats, pretty=True)
+    log(summary, pretty=True)
 
     return stats, summary
 
@@ -125,7 +123,7 @@ def benchmark_vary_shot(
     log(f"train size {len(train_set)}, test size {len(test_set)}")
 
     # Initialize benchmark results containers
-    all_stats = {}
+    all_summaries = {}
     token_count = 0
 
     # Run the benchmark
@@ -143,15 +141,15 @@ def benchmark_vary_shot(
         # Evaluate the current shot
         stats, summary = run(match, test_set[:num_test])
 
-        all_stats[num_shot] = stats
-        token_count += sum(summary["token_counts"])
+        all_summaries[num_shot] = summary
+        token_count += summary["total_tokens"]
 
     # Print summary of benchmarks
     log(header("Benchmark summary", char="="))
     log({
-        "Accuracy": {num_shot: stats["accuracy"] for num_shot, stats in all_stats.items()},
-        "Avg token count": {num_shot: stats["avg_token_count"] for num_shot, stats in all_stats.items()},
-        "Avg latency": {num_shot: stats["avg_latency"] for num_shot, stats in all_stats.items()},
+        "Accuracy": {num_shot: summary["accuracy"] for num_shot, summary in all_summaries.items()},
+        "Avg token count": {num_shot: summary["avg_tokens"] for num_shot, summary in all_summaries.items()},
+        "Avg latency": {num_shot: summary["avg_latency"] for num_shot, summary in all_summaries.items()},
         "Total tokens used": token_count
     }, pretty=True)
 
