@@ -14,7 +14,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "record", "flat.yaml"
+    "record", "hass_stc_chat.yaml"
 )
 
 
@@ -38,10 +38,10 @@ def run(match, test_set):
             target_schema=target,
         )["text"]
         
-        print("RAW PREDICTION: ", pred_corresp)
-
         # validate the prediction
         try:
+            # CHANGE: output parser to format_output for RecordChatMatch
+            #         output parse to pt_format_output for RecordPromptMatch
             pred_corresp = match_util.pt_format_output(pred_corresp)
         except:
             pass
@@ -80,15 +80,15 @@ def run(match, test_set):
 def benchmark_vary_shot(
         # dataset params
         filepath=default_dataset,
-        test_size=0.75,
+        test_size=0.25,
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
-        match_method=RecordPromptMatch,
+        match_method=RecordPromptMatch, # CHANGE: to RecordChatMatch OR RecordPromptMatch
         # benchmark params
-        min_num_shot=1,
+        min_num_shot=0,
         max_num_shot=2,
-        num_test=10,
+        num_test=1,
         verbose=True,
         seed=42,
 ):
@@ -135,15 +135,25 @@ def benchmark_vary_shot(
         # Initialize matching method with current shot
         debug_examples = [
             {
-                "source": """{{ "light": "on", "brightness": 100, "color": "red", "mode": "day" }}""",
-                "target": """{{ "power": "active", "brightness": 1, "color": "red", "mode": "day" }}""",
-                "correspondence": """{{ "from": "light", "to": "power", "transformation": "rename on active" }}, {{ "from": "brightness", "to": "brightness", "transformation": "X / 100" }}, {{ "from": "color", "to": "color", "transformation": "" }}, {{ "from": "mode", "to": "mode", "transformation": "" }}"""
+                "source": """{{ "temperature": 66, "units": "F"}}""",
+                "target": """{{ "current_temperature": 18.89}}""",
+                "correspondence": """{{ "from": "temperature", "to": "current_temperature", "transformation": "(X - 32) * 5 / 9" }}, {{ "from": "units", "to": "", "transformation": "remove units" }}"""
+            },
+            {
+                "source": """{{ "thermostatFanMode": "followschedule", "data": "supportThermostatFanModes" }}""",
+                "target": """{{ "fan_mode": "schedule"}}""",
+                "correspondence": """{{ "from": "thermostatFanMode", "to": "fan_mode", "transformation": "rename followschedule schedule" }}, {{ "from": "data", "to": "", "transformation": "remove data" }}"""
+            },
+            {
+                "source": """{{ "SwitchState": "on" }}""",
+                "target": """{{ "is_on": "true" }}""",
+                "correspondence": """{{ "from": "SwitchState", "to": "is_on", "transformation": "rename on true" }}"""
             }
         ]
         match = match_method(
-            examples=debug_examples,
-            #examples=train_set[:num_shot],
-            model=model,
+            examples = debug_examples, # CHANGE: uncomment this line for RecordPromptMatch
+            #examples=train_set[:num_shot], # CHANGE: uncomment this line for RecordChatMatch
+            model=model, 
             temperature=temperature,
             verbose=verbose,
         )
