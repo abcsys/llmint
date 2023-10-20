@@ -42,7 +42,7 @@ def run(match, test_set):
         try:
             # CHANGE: output parser to format_output for RecordChatMatch
             #         output parse to pt_format_output for RecordPromptMatch
-            pred_corresp = match_util.pt_format_output(pred_corresp)
+            pred_corresp = match_util.format_output(pred_corresp)
         except:
             pass
         is_correct = pred_corresp == true_corresp
@@ -84,7 +84,7 @@ def benchmark_vary_shot(
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
-        match_method=RecordPromptMatch, # CHANGE: to RecordChatMatch OR RecordPromptMatch
+        match_method=RecordChatMatch, # CHANGE: to RecordChatMatch OR RecordPromptMatch
         # benchmark params
         min_num_shot=0,
         max_num_shot=2,
@@ -151,8 +151,8 @@ def benchmark_vary_shot(
             }
         ]
         match = match_method(
-            examples = debug_examples, # CHANGE: uncomment this line for RecordPromptMatch
-            #examples=train_set[:num_shot], # CHANGE: uncomment this line for RecordChatMatch
+            #examples = debug_examples[:num_shot], # CHANGE: uncomment this line for RecordPromptMatch
+            examples=train_set[:num_shot], # CHANGE: uncomment this line for RecordChatMatch
             model=model, 
             temperature=temperature,
             verbose=verbose,
