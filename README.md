@@ -1,7 +1,7 @@
 # Llmint
 Fast, adaptive, modular data integration toolchain powered by LLM.
 
-Configure your OpenAI key in ~/.chatz/config.yaml as `openai_api_key: YOUR KEY`.
+Configure your OpenAI key in `~/.llmint/config.yaml` as `openai_api_key: YOUR KEY`.
 
 Given data from a data provider (source) and a data consumer (target):
 ```yaml
