@@ -7,17 +7,14 @@ from langchain.prompts import FewShotChatMessagePromptTemplate, ChatPromptTempla
 from langchain.chains import LLMChain
 from llmint import mint_utils
 from llmint.mapper import Mapper
-from llmint.mapper.output import format_output
+import llmint.mapper.output as output_util
+from llmint.mint.llm import LLM as MintLLM
 
 
-class RecordMapper(Mapper):
+class RecordChatMapper(Mapper, MintLLM):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class RecordChatMapper(RecordMapper):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        Mapper.__init__(self)
+        MintLLM.__init__(self, *args, **kwargs)
 
     def prepare(self):
         """
@@ -65,5 +62,7 @@ class RecordChatMapper(RecordMapper):
         return {"input_message": message}
 
     def format_output(self, output):
-        return format_output(output)
-       
+        return output_util.format_output(output)
+
+    def invoke(self, source_record, target_record):
+        MintLLM.invoke(self, source_record, target_record)

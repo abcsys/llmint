@@ -31,10 +31,7 @@ def run(mapper, test_set):
         true_mapping = sample["mapping"]
         log(mapper.format_input(source, target))
 
-        pred_mapping = mapper.invoke(
-            source_schema=source,
-            target_schema=target,
-        )["text"]
+        pred_mapping = mapper.invoke(source, target)
 
         # validate the prediction
         try:
