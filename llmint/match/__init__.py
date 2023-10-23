@@ -3,7 +3,6 @@ from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
 from llmint.mint.telemetry import Telemetry
 
-# TBD switch RecordMatch to Match base class
 class Match():
     def __init__(
             self,

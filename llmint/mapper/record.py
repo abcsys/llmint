@@ -65,4 +65,4 @@ class RecordChatMapper(Mapper, MintLLM):
         return output_util.format_output(output)
 
     def invoke(self, source_record, target_record):
-        MintLLM.invoke(self, source_record, target_record)
+        return MintLLM.invoke(self, source_record, target_record)

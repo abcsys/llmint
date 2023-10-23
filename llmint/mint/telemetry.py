@@ -3,7 +3,7 @@ import numpy as np
 from langchain.callbacks import manager as cb_manager
 from langchain.callbacks import get_openai_callback
 
-
+# TBD make Telemetry mergeable (.add method).
 class Telemetry:
     def __init__(self):
         self.total_tokens = []
@@ -74,7 +74,7 @@ def test():
     from llmint import util
     import pprint as pp
 
-    llm = OpenAI(openai_api_key=util.get_openai_key())
+    llm = OpenAI(openai_api_key=util.get_openai_api_key())
 
     telemetry = Telemetry()
     with get_openai_callback() as cb:

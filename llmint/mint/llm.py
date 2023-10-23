@@ -46,7 +46,7 @@ class LLM(ABC):
             with self.telemetry.report(cb):
                 output_message = self.chain.invoke(input)
         if self.verbose:
-            print("Output message from LLM:")
+            print("Raw output from LLM:")
             print(output_message)
         try:
             return self.format_output(output_message["text"])
