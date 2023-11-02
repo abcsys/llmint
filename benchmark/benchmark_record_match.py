@@ -16,7 +16,36 @@ default_dataset = os.path.join(
     "mint-sample-data",
     "record", "hass_stc_chat.yaml"
 )
+matchClass = RecordPromptMatch
 
+"""
+Benchmark script for testing accuracy, latency, and token count of RecordPromptMatch and RecordChatMatch.
+
+Modify matchClass on line 19 to change which match class you want to test. 
+Modify the yaml file name on line 17 to change which test/training example file you want to use.
+
+RecordPromptMatch only uses examples from recordPromptMatch_examples on line 29 because of its unique triple 
+quotation requirementsaround brackets. For now, modifying the yaml file name on line 17 will not change the testing/
+training examples used for RecordPromptMatch. 
+"""
+
+recordPromptMatch_examples = [
+            {
+                "source": """{{ "temperature": 66, "units": "F"}}""",
+                "target": """{{ "current_temperature": 18.89}}""",
+                "correspondence": """{{ "from": "temperature", "to": "current_temperature", "transformation": "(X - 32) * 5 / 9" }}, {{ "from": "units", "to": "", "transformation": "remove units" }}"""
+            },
+            {
+                "source": """{{ "thermostatFanMode": "followschedule", "data": "supportThermostatFanModes" }}""",
+                "target": """{{ "fan_mode": "schedule"}}""",
+                "correspondence": """{{ "from": "thermostatFanMode", "to": "fan_mode", "transformation": "rename followschedule schedule" }}, {{ "from": "data", "to": "", "transformation": "remove data" }}"""
+            },
+            {
+                "source": """{{ "SwitchState": "on" }}""",
+                "target": """{{ "is_on": "true" }}""",
+                "correspondence": """{{ "from": "SwitchState", "to": "is_on", "transformation": "rename on true" }}"""
+            }
+        ]
 
 # TBD: refactor this to use the Match base class
 def run(match, test_set):
@@ -42,7 +71,8 @@ def run(match, test_set):
         try:
             # CHANGE: output parser to format_output for RecordChatMatch
             #         output parse to pt_format_output for RecordPromptMatch
-            pred_corresp = match_util.format_output(pred_corresp)
+            pred_corresp = match_util.format_output(pred_corresp) if matchClass == RecordChatMatch \
+                                                                  else match_util.pt_format_output(pred_corresp)
         except:
             pass
         is_correct = pred_corresp == true_corresp
@@ -84,7 +114,7 @@ def benchmark_vary_shot(
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
-        match_method=RecordChatMatch, # CHANGE: to RecordChatMatch OR RecordPromptMatch
+        match_method=matchClass,
         # benchmark params
         min_num_shot=0,
         max_num_shot=2,
@@ -133,26 +163,9 @@ def benchmark_vary_shot(
         log(header(f"Running for {num_shot} shots", char="="))
 
         # Initialize matching method with current shot
-        debug_examples = [
-            {
-                "source": """{{ "temperature": 66, "units": "F"}}""",
-                "target": """{{ "current_temperature": 18.89}}""",
-                "correspondence": """{{ "from": "temperature", "to": "current_temperature", "transformation": "(X - 32) * 5 / 9" }}, {{ "from": "units", "to": "", "transformation": "remove units" }}"""
-            },
-            {
-                "source": """{{ "thermostatFanMode": "followschedule", "data": "supportThermostatFanModes" }}""",
-                "target": """{{ "fan_mode": "schedule"}}""",
-                "correspondence": """{{ "from": "thermostatFanMode", "to": "fan_mode", "transformation": "rename followschedule schedule" }}, {{ "from": "data", "to": "", "transformation": "remove data" }}"""
-            },
-            {
-                "source": """{{ "SwitchState": "on" }}""",
-                "target": """{{ "is_on": "true" }}""",
-                "correspondence": """{{ "from": "SwitchState", "to": "is_on", "transformation": "rename on true" }}"""
-            }
-        ]
         match = match_method(
-            #examples = debug_examples[:num_shot], # CHANGE: uncomment this line for RecordPromptMatch
-            examples=train_set[:num_shot], # CHANGE: uncomment this line for RecordChatMatch
+            examples= train_set[:num_shot] if match_method == RecordChatMatch \
+                                           else recordPromptMatch_examples,
             model=model, 
             temperature=temperature,
             verbose=verbose,
