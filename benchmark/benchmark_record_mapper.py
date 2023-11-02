@@ -13,7 +13,7 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "record", "flat_light_varied_value.yaml"
+    "record", "flat_light.yaml"
 )
 
 
@@ -31,10 +31,7 @@ def run(mapper, test_set):
         true_mapping = sample["mapping"]
         log(mapper.format_input(source, target))
 
-        pred_mapping = mapper.invoke(
-            source_schema=source,
-            target_schema=target,
-        )["text"]
+        pred_mapping = mapper.invoke(source, target)
 
         # validate the prediction
         try:
@@ -82,8 +79,8 @@ def benchmark_vary_shot(
         temperature=0.0,
         match_method=RecordChatMapper,
         # benchmark params
-        min_num_shot=0,
-        max_num_shot=2,
+        min_num_shot=1,
+        max_num_shot=1,
         num_test=5,
         verbose=True,
         seed=42,

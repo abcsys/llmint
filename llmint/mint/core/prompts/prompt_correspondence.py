@@ -1,0 +1,3 @@
+"""
+Mint correspondence schema.
+"""

@@ -1,9 +1,17 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
 from llmint.mint.telemetry import Telemetry
 
-class Match():
+"""
+Provides base classes for LLMs used in Llmint.
+
+TBD Common prompt optimization methods.
+See: https://www.reddit.com/r/OpenAI/comments/13scry1/how_to_reduce_your_openai_costs_by_up_to_30_3/
+"""
+
+
+class LLM(ABC):
     def __init__(
             self,
             examples=None,
@@ -21,35 +29,26 @@ class Match():
 
     @abstractmethod
     def prepare(self) -> (LLMChain, str):
-        """
-        Prepares the prompt and LLMChain.
-        """
         pass
 
     @abstractmethod
-    def format_input(self, source_schema, target_schema) -> dict:
+    def format_output(self, output) -> dict:
         pass
 
-    def invoke(self, source_schema, target_schema):
-        """
-        Invokes the LLMChain for schema matching.
+    @abstractmethod
+    def format_input(self, source, target) -> dict:
+        pass
 
-        Args:
-        - source: The source schema.
-        - target: The target schema.
-
-        Returns:
-        Correspondences between the source and target.
-        """
-        input = self.format_input(source_schema, target_schema)
+    def invoke(self, source, target):
+        input = self.format_input(source, target)
 
         with get_openai_callback() as cb:
             with self.telemetry.report(cb):
                 output_message = self.chain.invoke(input)
-        return output_message
-
-
-__all__ = [
-    'util',
-    'record'
-]
+        if self.verbose:
+            print("Raw output from LLM:")
+            print(output_message)
+        try:
+            return self.format_output(output_message["text"])
+        except:
+            raise ValueError(f"Invalid output message: {output_message}")

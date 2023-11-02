@@ -1,3 +1,7 @@
+"""
+Mint mapping schema.
+
+TBD turn the following into the OpenAI function calling schema
 FieldTransformation:
   - command: RENAME
     syntax: RENAME <field_name> TO <new_field_name>
@@ -44,3 +48,4 @@ ExtendedCommands:
   - command: COMBINE
     syntax: COMBINE <field_1>, <field_2> TO <new_field_name> USING <operation>
     example: COMBINE first_name, last_name TO full_name USING CONCATENATE
+"""
