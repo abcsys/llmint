@@ -30,3 +30,23 @@ def format_output(raw_output):
     split_pairs = [item.split(": ")[1].strip("'") for item in raw_output]
     # Create dictionaries in pairs of two items
     return [{'from': split_pairs[i], 'to': split_pairs[i + 1]} for i in range(0, len(split_pairs), 2)]
+
+def pt_format_output(raw_output):
+    """Convert the prediction format to match the desired ground-truth format."""
+    # Clean brackets and quotes, split into `from` and `to` of the form 
+    # [['from: key1'], ['to: value1'], ['transformation: t1']... ['from: keyn], ['to: valuen], ['transformation: tn']]
+    clean_output = [item.replace("{ ", "").replace(" }", "").split(", ") for item in raw_output]
+    # Split strings by ': ' to get key-values of the form 
+    # [key1, value1, t1, key2, value2, t2, ..., keyn, valuen, tn]
+    split_pairs = [item[0].split(": ")[1].strip('"').strip("'") for item in clean_output]
+    # Create dictionaries in pairs of two items
+    return [{'from': split_pairs[i], 'to': split_pairs[i + 1]} for i in range(0, len(split_pairs), 3)]
+
+def pt_format_input(raw_input):
+    """Convert the input format to match the desired ground-truth format."""
+    # Clean brackets and quotes, split into `from` and `to` pairs
+    clean_input = [item.replace("{{ ", "").replace(" }}", "").split(", ") for item in raw_input]
+    # Split strings by ': ' to get key-value pairs
+    split_pairs = [ [item.split(": ")[1].strip('"').strip("'") for item in i] for i in clean_input]
+    # Create dictionaries in pairs of two items
+    return [{'from': split_pairs[i][0], 'to': split_pairs[i][1]} for i in range(0, len(split_pairs))]
