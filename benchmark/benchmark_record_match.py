@@ -14,9 +14,9 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "record", "hass_stc_chat.yaml"
+    "record", "flat_light.yaml" # CHANGE HERE
 )
-matchClass = RecordPromptMatch
+matchClass = RecordChatMatch # CHANGE HERE
 
 """
 Benchmark script for testing accuracy, latency, and token count of RecordPromptMatch and RecordChatMatch.
@@ -24,30 +24,10 @@ Benchmark script for testing accuracy, latency, and token count of RecordPromptM
 Modify matchClass on line 19 to change which match class you want to test. 
 Modify the yaml file name on line 17 to change which test/training example file you want to use.
 
-RecordPromptMatch only uses examples from recordPromptMatch_examples on line 29 because of its unique triple 
-quotation requirementsaround brackets. For now, modifying the yaml file name on line 17 will not change the testing/
-training examples used for RecordPromptMatch. 
+The only yaml file for RecordPromptMatch is currently the record_match_prompt.yaml file. RecordChatMatch
+can use any other yaml file for benchmarking.
 """
 
-recordPromptMatch_examples = [
-            {
-                "source": """{{ "temperature": 66, "units": "F"}}""",
-                "target": """{{ "current_temperature": 18.89}}""",
-                "correspondence": """{{ "from": "temperature", "to": "current_temperature", "transformation": "(X - 32) * 5 / 9" }}, {{ "from": "units", "to": "", "transformation": "remove units" }}"""
-            },
-            {
-                "source": """{{ "thermostatFanMode": "followschedule", "data": "supportThermostatFanModes" }}""",
-                "target": """{{ "fan_mode": "schedule"}}""",
-                "correspondence": """{{ "from": "thermostatFanMode", "to": "fan_mode", "transformation": "rename followschedule schedule" }}, {{ "from": "data", "to": "", "transformation": "remove data" }}"""
-            },
-            {
-                "source": """{{ "SwitchState": "on" }}""",
-                "target": """{{ "is_on": "true" }}""",
-                "correspondence": """{{ "from": "SwitchState", "to": "is_on", "transformation": "rename on true" }}"""
-            }
-        ]
-
-# TBD: refactor this to use the Match base class
 def run(match, test_set):
     match_correct = []
 
@@ -59,7 +39,8 @@ def run(match, test_set):
         log(header("Input"))
 
         source, target = sample["source"], sample["target"]
-        true_corresp = sample["correspondence"]
+        true_corresp = sample["correspondence"] if matchClass == RecordChatMatch \
+                                                else match_util.pt_format_input(sample["correspondence"])
         log(match.format_input(source, target))
 
         pred_corresp = match.invoke(
@@ -69,8 +50,6 @@ def run(match, test_set):
         
         # validate the prediction
         try:
-            # CHANGE: output parser to format_output for RecordChatMatch
-            #         output parse to pt_format_output for RecordPromptMatch
             pred_corresp = match_util.format_output(pred_corresp) if matchClass == RecordChatMatch \
                                                                   else match_util.pt_format_output(pred_corresp)
         except:
@@ -148,7 +127,10 @@ def benchmark_vary_shot(
     # Prepare dataset
     data = util.from_yaml(filepath)
     # XXX detect sample type
-    samples = list(from_mint_sample.read_match(data))
+    if (match_method == RecordChatMatch):
+        samples = list(from_mint_sample.read_match(data))
+    elif (match_method == RecordPromptMatch):
+        samples = list(from_mint_sample.read_pt_match(data))
     train_set, test_set = util.train_test_split(samples, test_size=test_size, seed=seed)
 
     assert len(test_set) >= num_test, "Number of test samples is greater than the actual test set size."
@@ -164,8 +146,7 @@ def benchmark_vary_shot(
 
         # Initialize matching method with current shot
         match = match_method(
-            examples= train_set[:num_shot] if match_method == RecordChatMatch \
-                                           else recordPromptMatch_examples,
+            examples = train_set[:num_shot],
             model=model, 
             temperature=temperature,
             verbose=verbose,

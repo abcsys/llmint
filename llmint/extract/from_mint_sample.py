@@ -39,3 +39,13 @@ def read_match(input_data: Dict[str, List[Dict]]) -> Generator:
                     for mapping in row["mapping"]
                 ],
             }
+
+def read_pt_match(input_data: Dict[str, List[Dict]]) -> Generator:
+    for kind, rows in input_data.items():
+        for row in rows:
+            yield {
+                "kind": kind,
+                "source": row["source"],
+                "target": row["target"],
+                "correspondence": [mapping for mapping in row["mapping"]]
+            }
