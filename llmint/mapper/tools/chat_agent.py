@@ -5,6 +5,7 @@ from langchain.tools.render import format_tool_to_openai_function
 from langchain.agents.format_scratchpad import format_to_openai_functions
 from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain.chains import LLMMathChain
+from langchain.llms import OpenAI
 
 from field_transformation.rename import RenameTool 
 from field_transformation.add import AddTool
@@ -20,19 +21,32 @@ from value_transformation.shift import ShiftTool
 from extended_commands.combine import CombineTool 
 from extended_commands.split import SplitTool
 
+import pprint
+
 llm = ChatOpenAI(temperature=0, 
                  model="gpt-3.5-turbo-0613",
                  openai_api_key="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")
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", "You are a helpful assistant"),
+        ("system", """
+                    Generate the mapping operators required to translate from the source schema 
+                    to the target schema. You may use multiple mapping tools to translate different
+                    attributes of each field, ex. name and type.
+
+                    Your final answer should only include the direct outputs of the tools you call.
+                    This is what an example output should look like:
+
+                    - <first tool raw output>
+                    - <second tool raw output>
+                    ...
+                     
+                  """
+        ),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ]
 )
-
-llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=True)
 
 tools = [RenameTool(), 
          AddTool(), 
@@ -64,11 +78,6 @@ agent = (
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 example = """
-          
-Generate the mapping operators required to translate from the source schema 
-to the target schema. You may use multiple mapping tools to translate different
-attributes of each field, ex. name and type.
-          
 Source Schema: Smart_light
 - Kind: smart light
 - Description: Sample source schema for a smart light
@@ -86,14 +95,16 @@ Target Fields:
 - Name: status
   Type: int
   Range: [1, 0]
-
-          """
+"""
 
 trivial_example = "What is 5 times 2?"
 
-agent_executor.invoke(
+pp = pprint.PrettyPrinter(width=41, compact=True)
+"""
+pp.pprint(agent_executor.invoke(
     {
         "input": example
     }
-)
-
+)['output'])
+"""
+agent_executor.run(example)
