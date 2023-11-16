@@ -5,8 +5,7 @@ from util.util import chat_completion_request, pretty_print_conversation, call_f
 
 import json
 
-tools = [
-    {
+add = {
         "type": "function",
         "function": {
             "name": "addFunction",
@@ -26,8 +25,9 @@ tools = [
                 "required": ["target_field", "field_type"],
             },
         }
-    },
-    {
+    }
+
+changeType = {
         "type": "function",
         "function": {
             "name": "changeTypeFunction",
@@ -55,8 +55,9 @@ tools = [
                 "required": ["source_field", "target_field", "source_type", "target_type"],
             },
         }
-    },
-    {
+    }
+
+delete = {
         "type": "function",
         "function": {
             "name": "deleteFunction",
@@ -72,8 +73,9 @@ tools = [
                 "required": ["source_field"],
             },
         }
-    },
-    {
+    }
+
+rename = {
         "type": "function",
         "function": {
             "name": "renameFunction",
@@ -94,7 +96,8 @@ tools = [
             },
         }
     }
-]
+
+tools = [changeType, rename]
 
 messages = [{"role": "system",
              "content": """
@@ -156,11 +159,11 @@ def documentation_walkthrough():
         # Step 3: call the function
         # Note: the JSON response may not always be valid; be sure to handle errors
         available_functions = {
-            "addFunction": addFunction,
+            #"addFunction": addFunction,
             "changeTypeFunction": changeTypeFunction,
-            "deleteFunction": deleteFunction,
+            #"deleteFunction": deleteFunction,
             "renameFunction": renameFunction,
-            "setDefaultFunction": setDefaultFunction,
+            #"setDefaultFunction": setDefaultFunction,
         }
         messages.append(response_message) # extend conversation with assistant's reply
         # Step 4: send the info for each function call and function response to the model
