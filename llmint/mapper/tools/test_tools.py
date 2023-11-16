@@ -44,12 +44,8 @@ tools = [RenameTool(),
          ScaleTool(),
          ShiftTool(),
          CombineTool(),
-         SplitTool(),
-         Tool(
-            name="Calculator",
-            func=llm_math_chain.run,
-            description="useful for when you need to answer questions about math",
-        )]
+         SplitTool()
+        ]
 
 llm_with_tools = llm.bind(functions=[format_tool_to_openai_function(t) for t in tools])
 
