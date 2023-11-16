@@ -8,7 +8,7 @@ class ApplyFuncSchema(BaseModel):
     function_name: str = Field(description="should be a function name which the  field's value in the source schema should be processed by to match the value in the target schema")
     
 class ApplyFuncTool(BaseTool):
-    name: str = "MAP_TOOL"
+    name: str = "APPLY_FUNC_TOOL"
     description: str = "Tool that returns the mapping operator for a field who's target value is achieved by applying the function_name to the source value"
     args_schema: Type[ApplyFuncSchema] = ApplyFuncSchema
     
@@ -23,6 +23,6 @@ class ApplyFuncTool(BaseTool):
     def _arun(
         self,
         field_name: str,
-        field_type: str
+        function_name: str,
     ) -> str:
         raise NotImplementedError

@@ -8,7 +8,7 @@ class ScaleSchema(BaseModel):
     factor: str = Field(description="factor by which the field's value in the source schema should be scaled by to match the value in the target schema")
     
 class ScaleTool(BaseTool):
-    name: str = "MAP_TOOL"
+    name: str = "SCALE_TOOL"
     description: str = "Tool that returns the mapping operator for a field who's value is of different scale between the source and target schema"
     args_schema: Type[ScaleSchema] = ScaleSchema
     
@@ -22,7 +22,7 @@ class ScaleTool(BaseTool):
     
     def _arun(
         self,
-        field_name: str,
-        field_type: str
+        field: str,
+        factor: str,
     ) -> str:
         raise NotImplementedError

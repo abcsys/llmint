@@ -8,7 +8,7 @@ class ShiftSchema(BaseModel):
     value: str = Field(description="value by which the field's value in the source schema should be shifted by to match the value in the target schema")
     
 class ShiftTool(BaseTool):
-    name: str = "MAP_TOOL"
+    name: str = "SHIFT_TOOL"
     description: str = "Tool that returns the mapping operator for a field who's value is shifted between the source and target schema"
     args_schema: Type[ShiftSchema] = ShiftSchema
     
@@ -22,7 +22,7 @@ class ShiftTool(BaseTool):
     
     def _arun(
         self,
-        field_name: str,
-        field_type: str
+        field: str,
+        value: str,
     ) -> str:
         raise NotImplementedError

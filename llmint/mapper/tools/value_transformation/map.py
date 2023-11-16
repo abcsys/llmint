@@ -24,7 +24,8 @@ class MapTool(BaseTool):
     
     def _arun(
         self,
-        field_name: str,
-        field_type: str
+        field: str,
+        old_value: str,
+        new_value: str
     ) -> str:
         raise NotImplementedError

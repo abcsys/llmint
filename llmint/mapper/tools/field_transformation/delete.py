@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class DeleteSchema(BaseModel):
-    source_field: str = Field(description="should be a a singular field name which is present in the source schema but not present in the target schema")
+    source_field: str = Field(description="should be a singular field name which is present in the source schema but not present in the target schema")
     
 class DeleteTool(BaseTool):
     name: str = "DELETE_TOOL"

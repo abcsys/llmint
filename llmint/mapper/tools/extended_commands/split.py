@@ -10,7 +10,7 @@ class SplitSchema(BaseModel):
     delimiter: str = Field(description="should be the delimiter character to split the source field name on")
     
 class SplitTool(BaseTool):
-    name: str = "MAP_TOOL"
+    name: str = "SPLIT_TOOL"
     description: str = "Tool that returns the mapping operator between a source and target schema fields where the target fields are split from the source field"
     args_schema: Type[SplitSchema] = SplitSchema
     
@@ -26,7 +26,9 @@ class SplitTool(BaseTool):
     
     def _arun(
         self,
-        field_name: str,
-        field_type: str
+        source_field: str,
+        new_field_1: str,
+        new_field_2: str,
+        delimiter: str
     ) -> str:
         raise NotImplementedError
