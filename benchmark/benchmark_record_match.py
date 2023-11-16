@@ -6,7 +6,7 @@ from benchmark.log import (
 import numpy as np
 
 from llmint.extract import from_mint_sample
-from llmint.match.record import RecordChatMatch
+from llmint.match.record import RecordChatMatch, RecordPromptMatch
 import llmint.match.util as match_util
 
 __dir__ = os.path.dirname(__file__)
@@ -14,11 +14,20 @@ __log_dir__ = os.path.join(__dir__, "logs")
 default_dataset = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "record", "flat.yaml"
+    "record", "flat_light.yaml" # CHANGE HERE
 )
+matchClass = RecordChatMatch # CHANGE HERE
 
+"""
+Benchmark script for testing accuracy, latency, and token count of RecordPromptMatch and RecordChatMatch.
 
-# TBD: refactor this to use the Match base class
+Modify matchClass on line 19 to change which match class you want to test. 
+Modify the yaml file name on line 17 to change which test/training example file you want to use.
+
+The only yaml file for RecordPromptMatch is currently the record_match_prompt.yaml file. RecordChatMatch
+can use any other yaml file for benchmarking.
+"""
+
 def run(match, test_set):
     match_correct = []
 
@@ -30,17 +39,19 @@ def run(match, test_set):
         log(header("Input"))
 
         source, target = sample["source"], sample["target"]
-        true_corresp = sample["correspondence"]
+        true_corresp = sample["correspondence"] if matchClass == RecordChatMatch \
+                                                else match_util.pt_format_input(sample["correspondence"])
         log(match.format_input(source, target))
 
         pred_corresp = match.invoke(
             source_schema=source,
             target_schema=target,
         )["text"]
-
+        
         # validate the prediction
         try:
-            pred_corresp = match_util.format_output(pred_corresp)
+            pred_corresp = match_util.format_output(pred_corresp) if matchClass == RecordChatMatch \
+                                                                  else match_util.pt_format_output(pred_corresp)
         except:
             pass
         is_correct = pred_corresp == true_corresp
@@ -78,15 +89,15 @@ def run(match, test_set):
 def benchmark_vary_shot(
         # dataset params
         filepath=default_dataset,
-        test_size=0.75,
+        test_size=0.25,
         # match params
         model="gpt-3.5-turbo", # "gpt-4"
         temperature=0.0,
-        match_method=RecordChatMatch,
+        match_method=matchClass,
         # benchmark params
         min_num_shot=0,
         max_num_shot=2,
-        num_test=10,
+        num_test=1,
         verbose=True,
         seed=42,
 ):
@@ -116,7 +127,10 @@ def benchmark_vary_shot(
     # Prepare dataset
     data = util.from_yaml(filepath)
     # XXX detect sample type
-    samples = list(from_mint_sample.read_match(data))
+    if (match_method == RecordChatMatch):
+        samples = list(from_mint_sample.read_match(data))
+    elif (match_method == RecordPromptMatch):
+        samples = list(from_mint_sample.read_pt_match(data))
     train_set, test_set = util.train_test_split(samples, test_size=test_size, seed=seed)
 
     assert len(test_set) >= num_test, "Number of test samples is greater than the actual test set size."
@@ -132,8 +146,8 @@ def benchmark_vary_shot(
 
         # Initialize matching method with current shot
         match = match_method(
-            examples=train_set[:num_shot],
-            model=model,
+            examples = train_set[:num_shot],
+            model=model, 
             temperature=temperature,
             verbose=verbose,
         )
