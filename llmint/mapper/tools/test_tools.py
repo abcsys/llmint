@@ -12,6 +12,14 @@ from field_transformation.change_type import ChangeTypeTool
 from field_transformation.delete import DeleteTool
 from field_transformation.set_default import SetDefaultTool
 
+from value_transformation.apply_func import ApplyFuncTool
+from value_transformation.map import MapTool
+from value_transformation.scale import ScaleTool
+from value_transformation.shift import ShiftTool
+
+from extended_commands.combine import CombineTool 
+from extended_commands.split import SplitTool
+
 llm = ChatOpenAI(temperature=0, 
                  model="gpt-3.5-turbo-0613",
                  openai_api_key="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")
@@ -31,6 +39,12 @@ tools = [RenameTool(),
          ChangeTypeTool(), 
          DeleteTool(), 
          SetDefaultTool(),
+         ApplyFuncTool(),
+         MapTool(),
+         ScaleTool(),
+         ShiftTool(),
+         CombineTool(),
+         SplitTool(),
          Tool(
             name="Calculator",
             func=llm_math_chain.run,
