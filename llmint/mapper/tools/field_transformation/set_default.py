@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class SetDefaultSchema(BaseModel):
-    source_field: str = Field(description="should be a a singular field name from the source record")
+    source_field: str = Field(description="should be a singular field name from the source record")
     target_field: str = Field(description="should be a singular field name from the target record corresponding to the source_field")
     default_value: str = Field(description="should be the default value of the given target schema's field")
     

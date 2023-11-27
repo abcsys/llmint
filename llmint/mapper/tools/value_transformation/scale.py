@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class ScaleSchema(BaseModel):
-    field: str = Field(description="should be a a singular field name that has different values between the source and target schema")
+    field: str = Field(description="should be a singular field name that has different values between the source and target schema")
     factor: str = Field(description="factor by which the field's value in the source schema should be scaled by to match the value in the target schema")
     
 class ScaleTool(BaseTool):

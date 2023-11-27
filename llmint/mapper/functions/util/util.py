@@ -4,7 +4,7 @@ import requests
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 from termcolor import colored
 
-from field_transformation.functions import addFunction, changeTypeFunction, deleteFunction, renameFunction, setDefaultFunction
+from field_transformation.functions import addFunction, changeTypeFunction, deleteFunction, renameFunction, setDefaultFunction, applyFuncFunction, mapFunction, scaleFunction, shiftFunction, combineFunction,   splitFunction
 
 GPT_MODEL = "gpt-3.5-turbo-0613"
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
@@ -69,3 +69,27 @@ def call_fn(name, args):
             return setDefaultFunction(source_field=args.get("source_field"),
                                target_field=args.get("target_field"),
                                default_value=args.get("default_value"))
+        case "applyFuncFunction":
+            return applyFuncFunction(field_name=args.get("field_name"), 
+                                     function_name=args.get("function_name"))
+        case "mapFunction":
+            return mapFunction(field=args.get("field"),
+                               old_value=args.get("old_value"),
+                               new_value=args.get("new_value"))
+        case "scaleFunction":
+            return scaleFunction(field=args.get("field"),
+                                 factor=args.get("factor"))
+        case "shiftFunction":
+            return shiftFunction(field=args.get("field"),
+                                 value=args.get("value"))
+        case "combineFunction":
+            return combineFunction(field_1=args.get("field_1"),
+                                   field_2=args.get("field_2"),
+                                   new_field=args.get("new_field"),
+                                   operation=args.get("operation"))
+        case "splitFunction":
+            return splitFunction(source_field=args.get("source_field"),
+                                 new_field_1=args.get("new_field_1"),
+                                 new_field_2=args.get("new_field_2"),
+                                 delimiter=args.get("delimiter"))
+                                     

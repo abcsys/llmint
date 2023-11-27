@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class MapSchema(BaseModel):
-    field: str = Field(description="should be a a singular field name that has different values between the source and target schema")
+    field: str = Field(description="should be a singular field name that has different values between the source and target schema")
     old_value: str = Field(description="should be the value of the field in the source schema")
     new_value: str = Field(description="should be the value of the field in the target schema")
     

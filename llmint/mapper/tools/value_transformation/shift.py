@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class ShiftSchema(BaseModel):
-    field: str = Field(description="should be a a singular field name that has different values between the source and target schema")
+    field: str = Field(description="should be a singular field name that has different values between the source and target schema")
     value: str = Field(description="value by which the field's value in the source schema should be shifted by to match the value in the target schema")
     
 class ShiftTool(BaseTool):

@@ -4,7 +4,7 @@ from typing import Optional, Type
 from pydantic import BaseModel, Field
 
 class ApplyFuncSchema(BaseModel):
-    field_name: str = Field(description="should be a a singular field name that has different values between the source and target schema")
+    field_name: str = Field(description="should be a singular field name that has different values between the source and target schema")
     function_name: str = Field(description="should be a function name which the  field's value in the source schema should be processed by to match the value in the target schema")
     
 class ApplyFuncTool(BaseTool):
@@ -18,7 +18,7 @@ class ApplyFuncTool(BaseTool):
         function_name: str,
     ) -> str:
         """Use the tool"""
-        return f'{{ from: {field_name} , to: {field_name}, transformation: APPLY_FUNC {field_name} {function_name} }}'   
+        return f'{{ from: {field_name}, to: {field_name}, transformation: APPLY_FUNC {field_name} {function_name} }}'   
     
     def _arun(
         self,
