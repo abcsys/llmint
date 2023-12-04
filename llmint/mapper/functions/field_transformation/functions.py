@@ -1,5 +1,5 @@
 # Field Transformation Tools
-def addFunction(target_field, field_type):
+def addOptionalFunction(target_field, field_type):
     return f'{{from: None, to: {target_field}, transformation: ADD {target_field} TYPE {field_type}}}'   
 
 def changeTypeFunction(source_field, target_field, source_type, target_type):
@@ -32,7 +32,7 @@ def combineFunction(field_1, field_2, new_field, operation):
      return f'{{from: ({field_1}, {field_2}), to: {new_field}, transformation: COMBINE {field_1}, {field_2} TO {new_field} USING {operation}}}'   
 
 def splitFunction(source_field, new_field_1, new_field_2, delimiter=None):
-    return f'{{ from: {source_field}, to: ({new_field_1}, {new_field_2}), transformation: SPLIT {source_field} INTO {new_field_1}, {new_field_2} BY {delimiter}}}'   
+    return f'{{from: {source_field}, to: ({new_field_1}, {new_field_2}), transformation: SPLIT {source_field} INTO {new_field_1}, {new_field_2} BY {delimiter}}}'   
 
 def missingFunction(target_field):
-    return f'{{ from: None, to: {target_field}, transformation: MISSING {target_field}}}'   
+    return f'{{from: None, to: {target_field}, transformation: MISSING {target_field}}}'   

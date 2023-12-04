@@ -4,7 +4,7 @@ import requests
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 from termcolor import colored
 
-from field_transformation.functions import (addFunction, 
+from field_transformation.functions import (addOptionalFunction, 
                                             changeTypeFunction, 
                                             deleteFunction, 
                                             renameFunction, 
@@ -63,8 +63,8 @@ def pretty_print_conversation(messages):
 
 def call_fn(name, args):
     match name:
-        case "addFunction":
-            return addFunction(target_field=args.get("target_field"), 
+        case "addOptionalFunction":
+            return addOptionalFunction(target_field=args.get("target_field"), 
                                field_type=args.get("field_type"))
         case "changeTypeFunction":
             return changeTypeFunction(source_field=args.get("source_field"),

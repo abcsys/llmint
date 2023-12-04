@@ -60,17 +60,13 @@ def simplisafe(num_shot, messages):
     
 messages = [{"role": "system",
              "content": """
-                        Generate the mapping operators required to translate from the source schema 
-                        to the target schema. Ensure that you translate all fields that differ between 
-                        the source and target schema. The result by applying the mapping should be 
-                        identitcal to the target schema. Only delete and add fields when there are
-                        absolutely no other similar fields that can be renamed or change typed to. 
-                        Make your mappings efficient. If a translation can be done with 1 mapping operation,
-                        just use 1 mapping operation. You may use as many mapping tools as you need 
-                        to translate different attributes of each field. For example, if a filed 
-                        needs to be renamed and have its type changed to achieve the correct target
-                        schema, you may call both the renameFunction and the changeTypeFunction on 
-                        the same field.
+                        Your job is to decide which of the provided functions are required to translate between a source and target schema.
+                        You may pick as many mapping functions as you need to fully translate between the schemas, but try to use as few as possible. 
+                        The most important part is picking the mapping functions, other comments are not required.
+                        Do not make any assumptions about the schema. The only information you should use to guide your response is what is described in the schemas.
+                        If you do not have enough information to completely translate between source fields and target fields, use the missing function.
+                        If you are unsure whether or not two fields correspond to each other, assume that they do not correspond to each other.
+                        Only consider two fields corresponding if you are absolutely confident based on the field descriptions.
                         """
             }]
 
@@ -110,9 +106,6 @@ def two_shot_benchmark():
         print("Accuracy: ", compare_results(responses, i))
         print(f"------------------------------")
     print("========================================")
-
-        
-        
 
 def one_shot_benchmark():
     print("========== One Shot Benchmarking for motionsensors.yaml ==========")
@@ -159,5 +152,3 @@ def zero_shot_benchmark():
     print("========================================")
 
 zero_shot_benchmark()
-#one_shot_benchmark()
-#two_shot_benchmark()
