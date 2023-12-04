@@ -31,6 +31,7 @@ messages = [{"role": "system",
                         Only consider two fields corresponding if you are absolutely confident based on the field descriptions.
                         """
             }]
+
 def zero_shot_benchmark():
     print("========== Zero Shot Benchmarking for motionsensors.yaml ==========")
     for i in range(len(example_schemas)):

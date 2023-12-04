@@ -1,16 +1,16 @@
 import yaml
-from field_transformation.functions import (addOptionalFunction, 
-                                            changeTypeFunction, 
-                                            deleteFunction, 
-                                            renameFunction, 
-                                            setDefaultFunction, 
-                                            applyFuncFunction, 
-                                            mapFunction, 
-                                            scaleFunction, 
-                                            shiftFunction, 
-                                            combineFunction, 
-                                            splitFunction, 
-                                            missingFunction)
+from functions import (addOptionalFunction, 
+                       changeTypeFunction, 
+                       deleteFunction, 
+                       renameFunction, 
+                       setDefaultFunction, 
+                       applyFuncFunction, 
+                       mapFunction, 
+                       scaleFunction, 
+                       shiftFunction, 
+                       combineFunction, 
+                       splitFunction, 
+                       missingFunction)
 
 def from_yaml(filepath):
     """Load a YAML file and return the data."""

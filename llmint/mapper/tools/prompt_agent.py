@@ -63,7 +63,6 @@ agent = (
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 example = """
-          
 Generate the mapping operators required to translate from the source schema 
 to the target schema. You may use multiple mapping tools to translate different
 attributes of each field, ex. name and type.
@@ -77,24 +76,43 @@ This is what an example output should look like:
 These are the source and target schemas you will need to translate: 
   
 Source Schema: Smart_light
-- Kind: smart light
-- Description: Sample source schema for a smart light
+- name: "SimpliSafe"
+  kind: "motion sensor"
+  description: "Attributes for the SimpliSafe motion sensor system."
+  fields:
+    - name: "trigger_instantly"
+      type: "boolean"
+      description: "Indicates whether the sensor will trigger instantly."
+      required: true
 
-Source Fields:
-- Name: power
-  Type: Enum
-  Range: ["on", "off"]
+    - name: "triggered"
+      type: "boolean"
+      description: "Indicates whether the sensor has been triggered."
+      required: true
+
+    - name: "low_battery"
+      type: "boolean"
+      description: "Indicates whether the sensor's battery is low."
+      required: true
 
 Target Schema: Smart_light
-- Kind: smart light
-- Description: Sample target schema for a smart light
+- name: "Vivint"
+  kind: "motion sensor"
+  description: "Attributes for the Vivint motion sensor system."
+  fields:
+    - name: "triggered"
+      type: "boolean"
+      description: "Indicates whether the sensor has been triggered."
+      required: true
 
-Target Fields:
-- Name: status
-  Type: int
-  Range: [1, 0]
+    - name: "enabled"
+      type: "boolean"
+      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
 
-          """
+    - name: "battery_level_percentage"
+      type: "integer"
+      description: "Measures the current battery level of the motion sensor."
+"""
 
 trivial_example = "What is 5 times 2?"
 

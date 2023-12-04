@@ -1,18 +1,18 @@
 import json
 from openai import OpenAI
 from util.util import *
-from field_transformation.functions import (addOptionalFunction, 
-                                            changeTypeFunction, 
-                                            deleteFunction, 
-                                            renameFunction, 
-                                            setDefaultFunction, 
-                                            applyFuncFunction, 
-                                            mapFunction, 
-                                            scaleFunction, 
-                                            shiftFunction, 
-                                            combineFunction, 
-                                            splitFunction, 
-                                            missingFunction)
+from functions import (addOptionalFunction, 
+                       changeTypeFunction, 
+                       deleteFunction, 
+                       renameFunction, 
+                       setDefaultFunction, 
+                       applyFuncFunction, 
+                       mapFunction, 
+                       scaleFunction, 
+                       shiftFunction, 
+                       combineFunction, 
+                       splitFunction, 
+                       missingFunction)
 
 add_optional = {
         "type": "function",
