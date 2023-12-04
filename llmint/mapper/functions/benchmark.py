@@ -1,11 +1,15 @@
-from test_functions import *
+import os
+from function_model import *
+from util.util import *
 
 __dir__ = os.path.dirname(__file__)
+# load schema training examples
 motion_sensor_dataset = os.path.join(
     __dir__, "..", "..", "..", "..", 
     "mint-sample-data",
     "schema", "motionsensors.yaml"
 )
+# load schema testing examples
 motion_sensor_mappings = os.path.join(
     __dir__, "..", "..", "..", "..",
     "mint-sample-data",
@@ -15,49 +19,7 @@ example_schemas = from_yaml(motion_sensor_dataset)
 example_mappings = from_yaml(motion_sensor_mappings)
 num_examples = len(example_schemas)
 
-def compare_results(results, example_num):
-    num_correct = 0
-    for result in results:
-        #print("========================================")
-        for i in range(len(example_mappings[example_num]["mapping"])):
-            #print("-------------------------------")
-            #print(result)
-            #print(str(example_mappings[example_num]["mapping"][i]).replace("'", ""))
-            if result == str(example_mappings[example_num]["mapping"][i]).replace("'", ""):
-                #print("match")
-                num_correct += 1
-            #print("-------------------------------")
-        #print(("========================================"))
-    return num_correct / len(example_mappings[example_num]["mapping"])
-
-def simplisafe(num_shot, messages):
-    if num_shot > 0:
-        messages.append({
-                         "role": "user",
-                         "content": format_source_target(str(example_schemas[1]), 
-                                                         str(example_schemas[2]))
-                        })
-        messages.append({
-                         "role": "assistant",
-                         "content": str(example_mappings[3]["mapping"])
-                        })
-    if num_shot > 1:
-        messages.append({
-                         "role": "user",
-                         "content": format_source_target(str(example_schemas[2]), 
-                                                         str(example_schemas[1]))
-                        })
-        messages.append({
-                         "role": "assistant",
-                         "content": str(example_mappings[5]["mapping"])
-                        })
-    for i in range(2):
-        messages.append({
-                        "role": "user",
-                        "content": format_source_target(str(example_schemas[i]), 
-                                                        str(example_schemas[(i + 1) % num_examples]))
-                        })
-    
+# very first instructional message sent to the model
 messages = [{"role": "system",
              "content": """
                         Your job is to decide which of the provided functions are required to translate between a source and target schema.
@@ -69,7 +31,49 @@ messages = [{"role": "system",
                         Only consider two fields corresponding if you are absolutely confident based on the field descriptions.
                         """
             }]
+def zero_shot_benchmark():
+    print("========== Zero Shot Benchmarking for motionsensors.yaml ==========")
+    for i in range(len(example_schemas)):
+        print(f"---------- Running Example {i} ----------")
+        zero_shot_messages = messages.copy()
+        # user message
+        zero_shot_messages.append({
+                                    "role": "user",
+                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
+                                                                    str(example_schemas[(i + 1) % num_examples]))
+                                 })
+        responses = documentation_walkthrough(zero_shot_messages)
+        print("Accuracy: ", accuracy(responses, i, example_mappings))
+        print(f"------------------------------")
+    print("========================================")
 
+def one_shot_benchmark():
+    print("========== One Shot Benchmarking for motionsensors.yaml ==========")
+    for i in range(len(example_schemas)):
+        print(f"---------- Running Example {i} ----------")
+        print(f"Using example {example_mappings[(i + 1) % num_examples]["name"]}")
+        one_shot_messages = messages.copy() 
+        # first example
+        one_shot_messages.append({
+                                    "role": "user",
+                                    "content": format_source_target(str(example_schemas[(i + 1) % num_examples]), 
+                                                                    str(example_schemas[(i + 2) % num_examples]))
+                                 })
+        one_shot_messages.append({
+                                    "role": "assistant",
+                                    "content": str(example_mappings[(i + 1) % num_examples]["mapping"])
+                                 })
+        # user message
+        one_shot_messages.append({
+                                    "role": "user",
+                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
+                                                                    str(example_schemas[(i + 1) % num_examples]))
+                                 })
+        responses = documentation_walkthrough(one_shot_messages)
+        print("Accuracy: ", accuracy(responses, i, example_mappings))
+        print(f"------------------------------")
+    print("========================================")
+    
 def two_shot_benchmark():
     print("========== Two Shot Benchmarking for motionsensors.yaml ==========")
     for i in range(len(example_schemas)):
@@ -103,51 +107,7 @@ def two_shot_benchmark():
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
         responses = documentation_walkthrough(two_shot_messages)
-        print("Accuracy: ", compare_results(responses, i))
-        print(f"------------------------------")
-    print("========================================")
-
-def one_shot_benchmark():
-    print("========== One Shot Benchmarking for motionsensors.yaml ==========")
-    for i in range(len(example_schemas)):
-        print(f"---------- Running Example {i} ----------")
-        print(f"Using example {example_mappings[(i + 1) % num_examples]["name"]}")
-        one_shot_messages = messages.copy() 
-        # first example
-        one_shot_messages.append({
-                                    "role": "user",
-                                    "content": format_source_target(str(example_schemas[(i + 1) % num_examples]), 
-                                                                    str(example_schemas[(i + 2) % num_examples]))
-                                 })
-        one_shot_messages.append({
-                                    "role": "assistant",
-                                    "content": str(example_mappings[(i + 1) % num_examples]["mapping"])
-                                 })
-        # user message
-        one_shot_messages.append({
-                                    "role": "user",
-                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
-                                                                    str(example_schemas[(i + 1) % num_examples]))
-                                 })
-        responses = documentation_walkthrough(one_shot_messages)
-        print("Accuracy: ", compare_results(responses, i))
-        print(f"------------------------------")
-    print("========================================")
-            
-
-def zero_shot_benchmark():
-    print("========== Zero Shot Benchmarking for motionsensors.yaml ==========")
-    for i in range(len(example_schemas)):
-        print(f"---------- Running Example {i} ----------")
-        zero_shot_messages = messages.copy()
-        # user message
-        zero_shot_messages.append({
-                                    "role": "user",
-                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
-                                                                    str(example_schemas[(i + 1) % num_examples]))
-                                 })
-        responses = documentation_walkthrough(zero_shot_messages)
-        print("Accuracy: ", compare_results(responses, i))
+        print("Accuracy: ", accuracy(responses, i, example_mappings))
         print(f"------------------------------")
     print("========================================")
 

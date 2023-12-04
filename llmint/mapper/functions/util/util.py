@@ -1,9 +1,4 @@
-import json
-import openai
-import requests
-from tenacity import retry, wait_random_exponential, stop_after_attempt
-from termcolor import colored
-
+import yaml
 from field_transformation.functions import (addOptionalFunction, 
                                             changeTypeFunction, 
                                             deleteFunction, 
@@ -17,49 +12,29 @@ from field_transformation.functions import (addOptionalFunction,
                                             splitFunction, 
                                             missingFunction)
 
-GPT_MODEL = "gpt-3.5-turbo-0613"
-@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
-def chat_completion_request(messages, tools=None, tool_choice=None, model=GPT_MODEL):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + "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",
-    }
-    json_data = {"model": model, "messages": messages}
-    if tools is not None:
-        json_data.update({"tools": tools})
-    if tool_choice is not None:
-        json_data.update({"tool_choice": tool_choice})
-    try:
-        response = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers=headers,
-            json=json_data,
-        )
-        return response
-    except Exception as e:
-        print("Unable to generate ChatCompletion response")
-        print(f"Exception: {e}")
-        return e
-
-def pretty_print_conversation(messages):
-    role_to_color = {
-        "system": "red",
-        "user": "green",
-        "assistant": "blue",
-        "tool": "magenta",
-    }
+def from_yaml(filepath):
+    """Load a YAML file and return the data."""
+    with open(filepath, 'r') as f:
+        return yaml.load(f, Loader=yaml.SafeLoader)
     
-    for message in messages:
-        if message["role"] == "system":
-            print(colored(f"system: {message['content']}\n", role_to_color[message["role"]]))
-        elif message["role"] == "user":
-            print(colored(f"user: {message['content']}\n", role_to_color[message["role"]]))
-        elif message["role"] == "assistant" and message.get("function_call"):
-            print(colored(f"assistant: {message['function_call']}\n", role_to_color[message["role"]]))
-        elif message["role"] == "assistant" and not message.get("function_call"):
-            print(colored(f"assistant: {message['content']}\n", role_to_color[message["role"]]))
-        elif message["role"] == "tool":
-            print(colored(f"function ({message['name']}): {message['content']}\n", role_to_color[message["role"]]))
+def format_source_target(source, target):
+    return "Source Schema: " + source + "\nTarget Schema: " + target
+
+# accuracy measured by # of correct mappings / total mappings
+def accuracy(results, example_num, example_mappings):
+    num_correct = 0
+    for result in results:
+        #print("========================================")
+        for i in range(len(example_mappings[example_num]["mapping"])):
+            #print("-------------------------------")
+            #print(result)
+            #print(str(example_mappings[example_num]["mapping"][i]).replace("'", ""))
+            if result == str(example_mappings[example_num]["mapping"][i]).replace("'", ""):
+                #print("match")
+                num_correct += 1
+            #print("-------------------------------")
+        #print(("========================================"))
+    return num_correct / len(example_mappings[example_num]["mapping"])
 
 def call_fn(name, args):
     match name:

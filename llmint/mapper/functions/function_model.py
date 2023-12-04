@@ -1,8 +1,6 @@
-import os
 import json
-import yaml
-
-from openai import OpenAI, ChatCompletion
+from openai import OpenAI
+from util.util import *
 from field_transformation.functions import (addOptionalFunction, 
                                             changeTypeFunction, 
                                             deleteFunction, 
@@ -15,8 +13,6 @@ from field_transformation.functions import (addOptionalFunction,
                                             combineFunction, 
                                             splitFunction, 
                                             missingFunction)
-
-from util.util import chat_completion_request, pretty_print_conversation, call_fn
 
 add_optional = {
         "type": "function",
@@ -335,15 +331,7 @@ tools = [add_optional,
          split, 
          missing]
 
-def from_yaml(filepath):
-    """Load a YAML file and return the data."""
-    with open(filepath, 'r') as f:
-        return yaml.load(f, Loader=yaml.SafeLoader)
-    
-def format_source_target(source, target):
-    return "Source Schema: " + source + "\nTarget Schema: " + target
-
-#model = "gpt-3.5-turbo-1106"
+# model = "gpt-3.5-turbo-1106"
 model = "gpt-4-1106-preview"
 
 #https://platform.openai.com/docs/guides/function-calling
@@ -401,28 +389,3 @@ def documentation_walkthrough(messages):
         # return function_responses
         print("Token Usage: ", response.usage)
     return function_responses
-
-"""  
-def cookbook():
-    chat_response = chat_completion_request(
-        # messages,
-        tools=tools,
-        tool_choice="auto",
-    )
-    assistant_message = chat_response.json()
-    print(chat_response.json()['usage'])
-    return assistant_message
-
-# https://www.datacamp.com/tutorial/open-ai-function-calling-tutorial
-def tutorial():
-    response = ChatCompletion.create(
-        #model = 'gpt-3.5-turbo',
-        model = 'gpt-4',
-        # messages = messages,
-        functions = tools,
-        function_call = 'auto'
-    )
-    
-    json_response = json.loads(response['choices'][0]['message']['function_call']['arguments'])
-    return json_response
-"""
