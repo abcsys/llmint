@@ -159,5 +159,5 @@ def zero_shot_benchmark():
     print("========================================")
 
 zero_shot_benchmark()
-one_shot_benchmark()
-two_shot_benchmark()
+#one_shot_benchmark()
+#two_shot_benchmark()

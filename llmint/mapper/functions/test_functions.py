@@ -3,7 +3,18 @@ import json
 import yaml
 
 from openai import OpenAI, ChatCompletion
-from field_transformation.functions import addFunction, changeTypeFunction, deleteFunction, renameFunction, setDefaultFunction, applyFuncFunction, mapFunction, scaleFunction, shiftFunction, combineFunction,   splitFunction
+from field_transformation.functions import (addFunction, 
+                                            changeTypeFunction, 
+                                            deleteFunction, 
+                                            renameFunction, 
+                                            setDefaultFunction, 
+                                            applyFuncFunction, 
+                                            mapFunction, 
+                                            scaleFunction, 
+                                            shiftFunction, 
+                                            combineFunction, 
+                                            splitFunction, 
+                                            missingFunction)
 
 from util.util import chat_completion_request, pretty_print_conversation, call_fn
 
@@ -11,7 +22,7 @@ add = {
         "type": "function",
         "function": {
             "name": "addFunction",
-            "description": "Returns the mapping operator between a source and target schema field where the field is not present in the source schema but is present in the target schema",
+            "description": "Returns a mapping operator between a source and target schema, where an effective translation from source to target schema consists of adding a field to the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -33,25 +44,25 @@ changeType = {
         "type": "function",
         "function": {
             "name": "changeTypeFunction",
-            "description": "Returns the mapping operator between a source and target schema field with different types",
+            "description": "Returns a mapping operator between a source and target schema, where an effective tranlsation from source to target schema consists of changing the type of a source field",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "source_field": {
                         "type": "string",
-                        "description": "A singular field name from the source record",
+                        "description": "A singular field name from the source schema",
                     },
                     "target_field": {
                         "type": "string", 
-                        "description": "A singular field name from the target record corresponding to the source_field",
+                        "description": "A singular field name from the target schema",
                     },
                     "source_type": {
                         "type": "string", 
-                        "description": "The source type of the field name",
+                        "description": "The type of the source field",
                     },
                     "target_type": {
                         "type": "string", 
-                        "description": "The target type of the field name",
+                        "description": "The type of the target field",
                     },
                 },
                 "required": ["source_field", "target_field", "source_type", "target_type"],
@@ -63,13 +74,13 @@ delete = {
         "type": "function",
         "function": {
             "name": "deleteFunction",
-            "description": "Returns the mapping operator between a source and target schema field where the field is present in the source schema but not in the target schema",
+            "description": "Returns a mapping operator between a source and target schema, where an effective translation from source to target schema consists of deleting a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "source_field": {
                         "type": "string",
-                        "description": "A singular field name which is present in the source schema but not present in the target schema",
+                        "description": "A singular field name from the source schema",
                     },
                 },
                 "required": ["source_field"],
@@ -81,17 +92,17 @@ rename = {
         "type": "function",
         "function": {
             "name": "renameFunction",
-            "description": "Returns the mapping operator between a source and target schema field with different names",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of renaming a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "source_field": {
                         "type": "string",
-                        "description": "A singular field name from the source record",
+                        "description": "A singular field name from the source schema",
                     },
                     "target_field": {
                         "type": "string",
-                        "description": "A singular field name from the target record corresponding to the source_field",
+                        "description": "A singular field name from the target schema",
                     },
                 },
                 "required": ["source_field", "target_field"],
@@ -103,17 +114,17 @@ set_default = {
         "type": "function",
         "function": {
             "name": "setDefaultFunction",
-            "description": "Returns the mapping operator that sets the default value of a target schema's field",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of setting a new default value for a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "source_field": {
                         "type": "string",
-                        "description": "A singular field name from the source record",
+                        "description": "A singular field name from the source schema",
                     },
                     "target_field": {
                         "type": "string",
-                        "description": "A singular field name from the target record corresponding to the source_field",
+                        "description": "A singular field name from the target schema",
                     },
                     "default_value": {
                         "type": "string",
@@ -129,20 +140,24 @@ apply_func = {
         "type": "function",
         "function": {
             "name": "applyFuncFunction",
-            "description": "Returns the mapping operator for a field who's target value is achieved by applying the function_name to the source value",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of applying a function to the values of a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "field_name": {
+                    "source_field": {
                         "type": "string",
-                        "description": "A singular field name that has different values between the source and target schema",
+                        "description": "A singular field name from the source schema",
+                    },
+                    "target_field": {
+                        "type": "string",
+                        "description": "A singular field name from the target schema",
                     },
                     "function_name": {
                         "type": "string",
-                        "description": "A function name which the field's value in the source schema should be processed by to match the value in the target schema",
+                        "description": "The name of the function to apply to the values of the source field in order to achieve the values of the target field",
                     },
                 },
-                "required": ["field_name", "function_name"],
+                "required": ["source_field", "target_field", "function_name"],
             },
         }
     }
@@ -151,13 +166,17 @@ map = {
         "type": "function",
         "function": {
             "name": "mapFunction",
-            "description": "Returns the mapping operator for a field who's value is of different types between the source and target schema",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of defining a mapping between the value of a field from the source schema to a value of a field from the target schema",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "field": {
+                    "source_field": {
                         "type": "string",
-                        "description": "A singular field name that has different values between the source and target schema",
+                        "description": "A singular field name from the source schema",
+                    },
+                    "target_field": {
+                        "type": "string",
+                        "description": "A singular field name from the target schema",
                     },
                     "old_value": {
                         "type": "string",
@@ -168,7 +187,7 @@ map = {
                         "description": "The value of the field in the target schema",
                     },
                 },
-                "required": ["field", "old_value", "new_value"],
+                "required": ["source_field", "target_field", "old_value", "new_value"],
             },
         }
     }
@@ -177,20 +196,24 @@ scale = {
         "type": "function",
         "function": {
             "name": "scaleFunction",
-            "description": "Returns the mapping operator for a field who's value is of different scale between the source and target schema",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of scaling the values of a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "field": {
+                    "source_field": {
                         "type": "string",
-                        "description": "A singular field name that has different values between the source and target schema",
+                        "description": "A singular field name from the source schema",
+                    },
+                    "target_field": {
+                        "type": "string",
+                        "description": "A singular field name from the target schema",
                     },
                     "factor": {
                         "type": "string",
-                        "description": "The factor by which the field's value in the source schema should be scaled by to match the value in the target schema",
+                        "description": "The factor by which the source field's values should be scaled by to match the target field's values",
                     },
                 },
-                "required": ["field", "factor"],
+                "required": ["source_field", "target_field", "factor"],
             },
         }
     }
@@ -199,20 +222,24 @@ shift = {
         "type": "function",
         "function": {
             "name": "shiftFunction",
-            "description": "Returns the mapping operator for a field who's value is shifted between the source and target schema",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of shifting the values of a field from the source schema",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "field": {
+                    "source_field": {
                         "type": "string",
-                        "description": "A singular field name that has different values between the source and target schema",
+                        "description": "A singular field name from the source schema",
+                    },
+                    "target_field": {
+                        "type": "string",
+                        "description": "A singular field name from the target schema",
                     },
                     "value": {
                         "type": "string",
-                        "description": "The value by which the field's value in the source schema should be shifted by to match the value in the target schema",
+                        "description": "The value by which the source field's values should be shifted by to match the target field's values",
                     },
                 },
-                "required": ["field", "value"],
+                "required": ["source_field", "target_field", "value"],
             },
         }
     }
@@ -221,7 +248,7 @@ combine = {
         "type": "function",
         "function": {
             "name": "combineFunction",
-            "description": "Returns the mapping operator between a 2 source fields and 1 target fields where the target field is a combination of the source fields",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of combining 2 source field names into 1 target field name",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -251,7 +278,7 @@ split = {
         "type": "function",
         "function": {
             "name": "splitFunction",
-            "description": "Returns the mapping operator between a source and target schema fields where the target fields are split from the source fields",
+            "description": "Returns the mapping operator between a source and target schema, where an effective translation from source to target schema consists of splitting 1 source field name into 2 target field names",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -261,11 +288,11 @@ split = {
                     },
                     "new_field_1": {
                         "type": "string",
-                        "description": "A new target field name split from the source field name",
+                        "description": "A singular target field name split from the source field name",
                     },
                     "new_field_2": {
                         "type": "string",
-                        "description": "A new target field name split from the source field name",
+                        "description": "A singular target field name split from the source field name",
                     },
                     "delimiter": {
                         "type": "string",
@@ -277,7 +304,36 @@ split = {
         }
     }
 
-tools = [add, changeType, delete, rename, set_default, apply_func, map, scale, shift, combine, split]
+missing = {
+        "type": "function",
+        "function": {
+            "name": "missingFunction",
+            "description": "Returns the mapping operator between a source and target schema, where a field from the target schema is unable to be translated from the information in the source",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "target_field": {
+                        "type": "string",
+                        "description": "A singular field name from the target schema",
+                    },
+                },
+                "required": ["target_field"],
+            },
+        }
+    }
+
+tools = [add, 
+         changeType, 
+         delete, 
+         rename, 
+         set_default, 
+         apply_func, 
+         map, 
+         scale, 
+         shift, 
+         combine, 
+         split, 
+         missing]
 
 # https://www.datacamp.com/tutorial/open-ai-function-calling-tutorial
 def tutorial():
@@ -331,6 +387,7 @@ def documentation_walkthrough(messages):
             "shiftFunction": shiftFunction,
             "combineFunction": combineFunction,
             "splitFunction": splitFunction,
+            "missingFunction": missingFunction,
         }
         messages.append(response_message) # extend conversation with assistant's reply
         # Step 4: send the info for each function call and function response to the model
