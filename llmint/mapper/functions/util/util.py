@@ -1,4 +1,5 @@
 import yaml
+import os
 from functions import (addOptionalFunction, 
                        changeTypeFunction, 
                        deleteFunction, 
@@ -11,6 +12,16 @@ from functions import (addOptionalFunction,
                        combineFunction, 
                        splitFunction, 
                        missingFunction)
+
+# Read OpenAI key from ~/.llmint/config.yaml
+def get_openai_api_key():
+    with open(os.path.expanduser("~/.llmint/config.yaml"), "r") as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+        if "openai_api_key" not in config:
+            raise Exception("OpenAI API key not found in ~/.llmint/config.yaml,"
+                            " please add 'openai_api_key: YOUR_KEY' in the file.")
+        openai_api_key = config["openai_api_key"]
+        return openai_api_key
 
 def from_yaml(filepath):
     """Load a YAML file and return the data."""

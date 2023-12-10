@@ -338,7 +338,7 @@ model = "gpt-4-1106-preview"
 def documentation_walkthrough(messages):
     print("Running on model", model)
     # Step 1: send the conversation and available functions to the model
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key= get_openai_api_key())
     
     response = client.chat.completions.create(
         model=model,

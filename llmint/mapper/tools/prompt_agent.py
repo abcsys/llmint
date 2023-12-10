@@ -21,9 +21,11 @@ from value_transformation.shift import ShiftTool
 from extended_commands.combine import CombineTool 
 from extended_commands.split import SplitTool
 
+from ..functions.util.util import *
+
 llm = OpenAI(temperature=0, 
              model="gpt-3.5-turbo-0613",
-             openai_api_key="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")
+             openai_api_key=get_openai_api_key())
 
 prompt = ChatPromptTemplate.from_messages(
     [
