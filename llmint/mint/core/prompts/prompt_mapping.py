@@ -8,7 +8,7 @@ FieldTransformation:
     example: RENAME status TO light_status
 
   - command: CHANGE_TYPE
-    syntax: CHANGE_TYPE <field_name> TO <new_type>
+    syntax: CHANGE_TYPE <field_name> FROM <old_type> TO <new_type>
     example: CHANGE_TYPE brightness TO float
 
   - command: DELETE
