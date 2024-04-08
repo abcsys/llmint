@@ -18,24 +18,30 @@ motion_sensor_mappings = os.path.join(
 example_schemas = from_yaml(motion_sensor_dataset)
 example_mappings = from_yaml(motion_sensor_mappings)
 num_examples = len(example_schemas)
+num_tests = len(example_mappings)
 
-# very first instructional message sent to the model
-messages = [{"role": "system",
-             "content": """
-                        Your job is to decide which of the provided functions are required to translate between a source and target schema.
-                        You may pick as many mapping functions as you need to fully translate between the schemas, but try to use as few as possible. 
-                        The most important part is picking the mapping functions, other comments are not required.
-                        Do not make any assumptions about the schema. The only information you should use to guide your response is what is described in the schemas.
-                        If you do not have enough information to completely translate between source fields and target fields, use the missing function.
-                        If you are unsure whether or not two fields correspond to each other, assume that they do not correspond to each other.
-                        Only consider two fields corresponding if you are absolutely confident based on the field descriptions.
-                        """
-            }]
+# general instructional message sent to the model
+with open("instructions/llmint_base.txt") as f:
+    messages = [{"role": "system",
+                "content": f.read()
+               }]
+
+# STL instructional message sent to the model
+with open("instructions/stl_base.txt") as f:
+    messages.append({"role": "system",
+                     "content": f.read()
+                    })
+    
+# end instructional message sent to the model
+with open("instructions/end_base.txt") as f:
+    messages.append({"role": "system",
+                     "content": f.read()
+                    })
 
 def zero_shot_benchmark():
-    print("========== Zero Shot Benchmarking for motionsensors.yaml ==========")
-    for i in range(len(example_schemas)):
-        print(f"---------- Running Example {i} ----------")
+    print("========== Zero Shot Benchmarking for motionsensors.yaml ==========", flush=True)
+    for i in range(3):
+        print(f"---------- Running Example {i} {str(example_schemas[i % num_examples]["name"])} to {str(example_schemas[(i + 1) % num_examples]["name"])} ----------", flush=True)
         zero_shot_messages = messages.copy()
         # user message
         zero_shot_messages.append({
@@ -44,9 +50,21 @@ def zero_shot_benchmark():
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
         responses = documentation_walkthrough(zero_shot_messages)
-        print("Accuracy: ", accuracy(responses, i, example_mappings))
-        print(f"------------------------------")
-    print("========================================")
+        accuracy(responses, i, example_mappings)
+        print(f"-------------------------------------------------------------", flush=True)
+    for i in range(3):
+        print(f"---------- Running Example {i + 3} {str(example_schemas[i]["name"])} to {str(example_schemas[i - 1]["name"])} ----------", flush=True)
+        zero_shot_messages = messages.copy()
+        # user message
+        zero_shot_messages.append({
+                                    "role": "user",
+                                    "content": format_source_target(str(example_schemas[i]), 
+                                                                    str(example_schemas[i - 1]))
+                                 })
+        responses = documentation_walkthrough(zero_shot_messages)
+        accuracy(responses, i + 3, example_mappings)
+        print(f"-------------------------------------------------------------", flush=True)
+    print("=========================================================", flush=True)
 
 def one_shot_benchmark():
     print("========== One Shot Benchmarking for motionsensors.yaml ==========")

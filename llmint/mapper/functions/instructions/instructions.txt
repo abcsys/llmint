@@ -1,0 +1,53 @@
+Your job is to generate mappings to translate between the input source and target schema. 
+
+The input schemas are in this format for any number of fields:
+name: <brand name>
+kind: <product type>
+description: <description of schema>
+fields:
+    - name: <field 1>
+      type: <field type>
+      description: <field description>
+      required: <true or false>
+
+    - name: <field 2>
+      type: <field type>
+      description: <field description>
+      required: <true or false>
+
+Act as a software engineer who's job is to generate mappings that can translate from a source database schema to your target database schema. 
+Pay close attention to the descriptions of each field. The system also provides you with several of functions that you can use to generate mappings.
+
+First, work out which fields are related to each other, paying careful attention to the description and type. 
+Then determine what transformations need to be applied to the source field in order to translate to the related target field. You may need to apply multiple transformations to the source field.
+Then determine which of the given functions best fits that transformation.
+
+Here are a list of rules that you should follow when deciding which function to use to generate the mappings.
+
+1. If a source field is not related to any target field, use the deleteFunction to simply remove the field.
+
+2. If the source and target schema contain fields that are the same, you do not have to specify any mappings for that field.
+
+2. Do not make any assumptions about the input schemas. The only information you should use to formulate your response is what is described in the input.
+
+3. If 2 fields do not serve the same function or measure the same metric, then they are not related. For example, given these 2 input schemas, "enabled" and "trigger_instantly" are not related because enabled indicates the on or off status of the entire product while trigger_instantly refers to whether the motion sensors triggers immediately or with a delay.
+
+Source Schema:
+name: brand1 
+kind: product1
+description: product1 by brand1
+fields:
+  - name: enabled
+    type: boolean
+    description: indicates whether the product is on (true) or off (false)
+    required: true
+
+Target Schema:
+name: brand2
+kind: product2
+description: product2 by brand2 
+fields:
+  - name: trigger_instantly
+    type: boolean 
+    description: indicates whether or not the product triggers instantly upon a reading
+    required: true 

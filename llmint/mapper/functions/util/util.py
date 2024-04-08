@@ -1,6 +1,8 @@
 import yaml
 import os
-from functions import (addOptionalFunction, 
+from termcolor import colored
+from functions import (doNothingFunction,
+                       addOptionalFunction, 
                        changeTypeFunction, 
                        deleteFunction, 
                        renameFunction, 
@@ -11,7 +13,14 @@ from functions import (addOptionalFunction,
                        shiftFunction, 
                        combineFunction, 
                        splitFunction, 
-                       missingFunction)
+                       missingFunction,
+                       sendMessageFunction)
+
+class pcolors:
+    RIGHT = '\033[92m'
+    WRONG = '\033[91m'
+    MISSING = '\033[33m'
+    ENDC = '\033[0m'
 
 # Read OpenAI key from ~/.llmint/config.yaml
 def get_openai_api_key():
@@ -33,66 +42,104 @@ def format_source_target(source, target):
 
 # accuracy measured by # of correct mappings / total mappings
 def accuracy(results, example_num, example_mappings):
-    num_correct = 0
-    for result in results:
-        #print("========================================")
+    correct = False
+    correctIdxs = []
+    numCorrect = 0
+    total = 0
+    print("Generated Mappings:", flush=True)
+    for result, reasoning in results:
         for i in range(len(example_mappings[example_num]["mapping"])):
-            #print("-------------------------------")
-            #print(result)
-            #print(str(example_mappings[example_num]["mapping"][i]).replace("'", ""))
             if result == str(example_mappings[example_num]["mapping"][i]).replace("'", ""):
-                #print("match")
-                num_correct += 1
-            #print("-------------------------------")
-        #print(("========================================"))
-    return num_correct / len(example_mappings[example_num]["mapping"])
-
+                print(pcolors.RIGHT + result + pcolors.ENDC + '\n', reasoning, flush=True)
+                numCorrect += 1
+                correctIdxs.append(i)
+                correct = True 
+        if not correct: 
+            print(pcolors.WRONG + result + pcolors.ENDC + '\n', reasoning, flush=True)
+        correct = False
+        total += 1
+    print("Ground Truth Mappings:", flush=True)
+    for i in range(len(example_mappings[example_num]["mapping"])):
+        if i in correctIdxs:
+            print(pcolors.RIGHT + str(example_mappings[example_num]["mapping"][i]).replace("'", "") + pcolors.ENDC, flush=True)
+        else:
+            print(pcolors.MISSING + str(example_mappings[example_num]["mapping"][i]).replace("'", "") + pcolors.ENDC, flush=True)           
+    print("Recall: ", len(correctIdxs), "/", len(example_mappings[example_num]["mapping"]), flush=True)
+    print("Precision: ", len(correctIdxs), "/", len(results), flush=True)
+    print("Total: ", numCorrect, "/", total, flush=True)
+        
+def print_responses(response, include_reasoning):
+    for result, reasoning in response:
+        if include_reasoning:
+            print(pcolors.RIGHT + result + pcolors.ENDC + '\n', reasoning, flush=True)
+        else:
+            print(pcolors.RIGHT + result + pcolors.ENDC, flush=True)
+    
+        
 def call_fn(name, args):
     match name:
+        case "doNothingFunction":
+            return doNothingFunction(source_field=args.get("source_field"), 
+                                     target_field=args.get("target_field"), 
+                                     reasoning=args.get("reasoning"))
         case "addOptionalFunction":
             return addOptionalFunction(target_field=args.get("target_field"), 
-                               field_type=args.get("field_type"))
+                                       field_type=args.get("field_type"),
+                                       reasoning=args.get("reasoning"))
         case "changeTypeFunction":
             return changeTypeFunction(source_field=args.get("source_field"),
                                       target_field=args.get("target_field"),
                                       source_type=args.get("source_type"),
-                                      target_type=args.get("target_type"))
+                                      target_type=args.get("target_type"),
+                                      reasoning=args.get("reasoning"))
         case "deleteFunction":
-            return deleteFunction(source_field=args.get("source_field"))
+            return deleteFunction(source_field=args.get("source_field"),
+                                  reasoning=args.get("reasoning"))
         case "renameFunction":
             return renameFunction(source_field=args.get("source_field"),
-                                  target_field=args.get("target_field"))
+                                  target_field=args.get("target_field"),
+                                  reasoning=args.get("reasoning"))
         case "setDefaultFunction":
             return setDefaultFunction(source_field=args.get("source_field"),
                                       target_field=args.get("target_field"),
-                                      default_value=args.get("default_value"))
+                                      default_value=args.get("default_value"),
+                                      reasoning=args.get("reasoning"))
         case "applyFuncFunction":
             return applyFuncFunction(source_field=args.get("source_field"), 
                                      target_field=args.get("target_field"), 
-                                     function_name=args.get("function_name"))
+                                     function_name=args.get("function_name"),
+                                     reasoning=args.get("reasoning"))
         case "mapFunction":
             return mapFunction(source_field=args.get("source_field"), 
                                target_field=args.get("target_field"), 
                                old_value=args.get("old_value"),
-                               new_value=args.get("new_value"))
+                               new_value=args.get("new_value"),
+                               reasoning=args.get("reasoning"))
         case "scaleFunction":
             return scaleFunction(source_field=args.get("source_field"), 
                                  target_field=args.get("target_field"), 
-                                 factor=args.get("factor"))
+                                 factor=args.get("factor"),
+                                 reasoning=args.get("reasoning"))
         case "shiftFunction":
             return shiftFunction(source_field=args.get("source_field"), 
                                  target_field=args.get("target_field"), 
-                                 value=args.get("value"))
+                                 value=args.get("value"),
+                                 reasoning=args.get("reasoning"))
         case "combineFunction":
             return combineFunction(field_1=args.get("field_1"),
                                    field_2=args.get("field_2"),
                                    new_field=args.get("new_field"),
-                                   operation=args.get("operation"))
+                                   operation=args.get("operation"),
+                                   reasoning=args.get("reasoning"))
         case "splitFunction":
             return splitFunction(source_field=args.get("source_field"),
                                  new_field_1=args.get("new_field_1"),
                                  new_field_2=args.get("new_field_2"),
-                                 delimiter=args.get("delimiter"))
+                                 delimiter=args.get("delimiter"),
+                                 reasoning=args.get("reasoning"))
         case "missingFunction":
-            return missingFunction(target_field=args.get("target_field"))
+            return missingFunction(target_field=args.get("target_field"),
+                                   reasoning=args.get("reasoning"))
+        case "sendMessageFunction":
+            return sendMessageFunction(message=args.get("message"))
                                      

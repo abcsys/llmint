@@ -1,0 +1,31 @@
+Input Format:
+The user will supply 2 database schemas, a source and a target schema. 
+The schemas will have the following format for any number of fields. Attributes marked as (optional) may or may not be present in the schemas.
+"""
+name: <brand_name>
+kind: <product_type>
+description: <description_of_schema>
+fields:
+    - name: <field_1>
+      type: <field_type>
+      description: <field_description>
+      required: <true or false>
+      default (optional): <default_value>
+      range (optional): <value_range>
+      min (optional): <min_value>
+      max (optional): <max_value>
+"""
+
+Required Field Attributes:
+- Required field attributes will always be present in every input schema.
+- name: describes what metric this field measures.
+- type: indicates what value type this field measures. An enum type indicates that this field's value can only be from a set of constant values given in the 'range' attribute.
+- description: a brief overview of what this field measures.
+- required: indicates whether or not this field is required for the schema. If a field in the target schema is not required, then you can either construct it by translating from a field in the source schema or simply using the addOptionalFunction.
+
+Optional Field Attributes:
+- Optional field attributes may or may not be present in every input schema.
+- default: indicates what the default value of this field is. If the target field has a default value defined, then you must use the setDefaultFunction.
+- range: a list of values that this field can be. If you need to translate between fields that are of enum type, use the mapFunction to map enum values to each other.
+- min: indicates the minimum value the field can be. You do not need to do any mappings for the min attribute.
+- max: indicates the maximum value the field can be. You do not need to do any mappings for the max attribute.
