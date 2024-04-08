@@ -1,0 +1,52 @@
+- name: "Neo Coolcam"
+  kind: "motion sensor"
+  description: "Attributes for the Neo Coolcam motion sensor system, known for its affordability and ease of integration with various smart home systems."
+  fields:
+    - name: "motion_detected"
+      type: "boolean"
+      description: "True if motion is detected, allowing for automation and security alerts."
+      required: true
+
+    - name: "lux"
+      type: "integer"
+      description: "Measures the light intensity in lux, useful for triggering lighting adjustments."
+      required: false
+
+    - name: "battery_level"
+      type: "integer"
+      description: "Current battery level percentage, indicating when a replacement is needed."
+      required: false
+
+    - name: "tamper_detection"
+      type: "boolean"
+      description: "Indicates if the sensor has been tampered with, enhancing security measures."
+      required: false
+
+    - name: "enabled"
+      type: "boolean"
+      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
+      required: true
+
+- name: "Aeotec Multisensor"
+  kind: "motion sensor"
+  description: "Attributes for the Aeotec Multisensor system, offering multiple sensing capabilities including motion, temperature, humidity, light, UV, and vibration."
+  fields:
+    - name: "motion_detected"
+      type: "boolean"
+      description: "True if motion is detected."
+      required: true
+
+    - name: "lux"
+      type: "integer"
+      description: "Light intensity measured in lux."
+      required: false
+
+    - name: "vibration"
+      type: "boolean"
+      description: "Indicates if vibration has been detected, useful for additional security monitoring."
+      required: false
+
+    - name: "enabled"
+      type: "boolean"
+      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
+      required: true
