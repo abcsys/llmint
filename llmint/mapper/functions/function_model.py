@@ -481,14 +481,8 @@ tools = [doNothing,
 # model = "gpt-3.5-turbo-1106"
 model = "gpt-4-1106-preview"
 
-<<<<<<< HEAD
 #https://platform.openai.com/docs/guides/function-calling
 def function_model(messages):
-=======
-
-# https://platform.openai.com/docs/guides/function-calling
-def documentation_walkthrough(messages):
->>>>>>> 9e1c1aa665390971ef0dceb17c439c1076503db9
     print("Running on model", model)
     # Step 1: send the conversation and available functions to the model
     client = OpenAI(api_key=get_openai_api_key())
