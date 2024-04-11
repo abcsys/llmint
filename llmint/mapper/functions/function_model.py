@@ -14,6 +14,7 @@ from functions import (doNothingFunction,
                        combineFunction, 
                        splitFunction, 
                        missingFunction,
+                       complexConversionFunction,
                        sendMessageFunction)
 
 doNothing = {
@@ -72,7 +73,7 @@ changeType = {
         "type": "function",
         "function": {
             "name": "changeTypeFunction",
-            "description": "Change the type of the source field",
+            "description": "Change the type of the source field.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -394,6 +395,36 @@ missing = {
         }
     }
 
+complexConversion = {
+        "type": "function",
+        "function": {
+            "name": "complexConversionFunction",
+            "description": "Describes the equation needed to convert from source to target values",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "source_field": {
+                        "type": "string",
+                        "description": "Field from the target schema",
+                    },
+                    "target_field": {
+                        "type": "string",
+                        "description": "Field from the target schema",
+                    },
+                    "conversion_equation": {
+                        "type": "string",
+                        "description": "Mathematical equation used in conversion. Let x be the source value and y be the target value.",
+                    },
+                    "reasoning": {
+                        "type": "string", 
+                        "description": "In-depth reasoning as to why you chose this function",
+                    },
+                },
+                "required": ["source_field", "target_field", "conversion_equation", "reasoning"],
+            },
+        }
+    }
+
 sendMessage = {
         "type": "function",
         "function": {
@@ -425,13 +456,14 @@ tools = [doNothing,
          combine, 
          split, 
          missing,
+         complexConversion,
          sendMessage]
 
 # model = "gpt-3.5-turbo-1106"
 model = "gpt-4-1106-preview"
 
 #https://platform.openai.com/docs/guides/function-calling
-def documentation_walkthrough(messages):
+def function_model(messages):
     print("Running on model", model)
     # Step 1: send the conversation and available functions to the model
     client = OpenAI(api_key= get_openai_api_key())
@@ -465,6 +497,7 @@ def documentation_walkthrough(messages):
             "combineFunction": combineFunction,
             "splitFunction": splitFunction,
             "missingFunction": missingFunction,
+            "complexConversionFunction": complexConversionFunction,
             "sendMessageFunction": sendMessageFunction,
         }
         messages.append(response_message) # extend conversation with assistant's reply

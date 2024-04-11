@@ -32,7 +32,7 @@ def mapper_API(file, include_reasoning=False):
         "content": format_source_target(source_schema, target_schema)
     })
     
-    response = documentation_walkthrough(messages)
+    response = function_model(messages)
     print_responses(response, include_reasoning)
 
-mapper_API("mapper_input.yaml", False)
+mapper_API("mapper_input.yaml", True)

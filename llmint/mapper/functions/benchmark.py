@@ -49,7 +49,7 @@ def zero_shot_benchmark():
                                     "content": format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = documentation_walkthrough(zero_shot_messages)
+        responses = function_model(zero_shot_messages)
         accuracy(responses, i, example_mappings)
         print(f"-------------------------------------------------------------", flush=True)
     for i in range(3):
@@ -61,7 +61,7 @@ def zero_shot_benchmark():
                                     "content": format_source_target(str(example_schemas[i]), 
                                                                     str(example_schemas[i - 1]))
                                  })
-        responses = documentation_walkthrough(zero_shot_messages)
+        responses = function_model(zero_shot_messages)
         accuracy(responses, i + 3, example_mappings)
         print(f"-------------------------------------------------------------", flush=True)
     print("=========================================================", flush=True)
@@ -88,7 +88,7 @@ def one_shot_benchmark():
                                     "content": format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = documentation_walkthrough(one_shot_messages)
+        responses = function_model(one_shot_messages)
         print("Accuracy: ", accuracy(responses, i, example_mappings))
         print(f"------------------------------")
     print("========================================")
@@ -125,7 +125,7 @@ def two_shot_benchmark():
                                     "content": format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = documentation_walkthrough(two_shot_messages)
+        responses = function_model(two_shot_messages)
         print("Accuracy: ", accuracy(responses, i, example_mappings))
         print(f"------------------------------")
     print("========================================")

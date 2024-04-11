@@ -40,5 +40,8 @@ def splitFunction(source_field, new_field_1, new_field_2, reasoning, delimiter=N
 def missingFunction(target_field, reasoning):
     return (f'{{from: None, to: {target_field}, transformation: MISSING {target_field}}}', reasoning)
 
+def complexConversionFunction(source_field, target_field, conversion_equation, reasoning):
+    return (f'{{from: {source_field}, to: {target_field}, transformation: CONVERT {conversion_equation}}}', reasoning)
+
 def sendMessageFunction(message):
     return (message, "No reasoning")

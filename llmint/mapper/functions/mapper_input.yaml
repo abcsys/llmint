@@ -1,32 +1,3 @@
-- name: "Neo Coolcam"
-  kind: "motion sensor"
-  description: "Attributes for the Neo Coolcam motion sensor system, known for its affordability and ease of integration with various smart home systems."
-  fields:
-    - name: "motion_detected"
-      type: "boolean"
-      description: "True if motion is detected, allowing for automation and security alerts."
-      required: true
-
-    - name: "lux"
-      type: "integer"
-      description: "Measures the light intensity in lux, useful for triggering lighting adjustments."
-      required: false
-
-    - name: "battery_level"
-      type: "integer"
-      description: "Current battery level percentage, indicating when a replacement is needed."
-      required: false
-
-    - name: "tamper_detection"
-      type: "boolean"
-      description: "Indicates if the sensor has been tampered with, enhancing security measures."
-      required: false
-
-    - name: "enabled"
-      type: "boolean"
-      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
-      required: true
-
 - name: "Aeotec Multisensor"
   kind: "motion sensor"
   description: "Attributes for the Aeotec Multisensor system, offering multiple sensing capabilities including motion, temperature, humidity, light, UV, and vibration."
@@ -44,6 +15,35 @@
     - name: "vibration"
       type: "boolean"
       description: "Indicates if vibration has been detected, useful for additional security monitoring."
+      required: false
+
+    - name: "enabled"
+      type: "boolean"
+      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
+      required: true
+
+- name: "Lutron Maestro Occupancy Sensor Switch"
+  kind: "motion sensor"
+  description: "Attributes for the Lutron Maestro Occupancy Sensor Switch, combining lighting control with motion detection to enhance convenience and energy savings."
+  fields:
+    - name: "occupancy_detected"
+      type: "boolean"
+      description: "True if occupancy is detected, automatically turning lights on."
+      required: true
+
+    - name: "light_level"
+      type: "integer"
+      description: "Controls the light level for dimmable lights when occupancy is detected."
+      required: false
+
+    - name: "timeout"
+      type: "integer"
+      description: "Time in minutes before turning lights off after no motion is detected."
+      required: false
+
+    - name: "sensitivity"
+      type: "integer"
+      description: "Adjusts the sensitivity of the motion sensor to prevent false triggers."
       required: false
 
     - name: "enabled"

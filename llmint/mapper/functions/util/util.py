@@ -14,6 +14,7 @@ from functions import (doNothingFunction,
                        combineFunction, 
                        splitFunction, 
                        missingFunction,
+                       complexConversionFunction,
                        sendMessageFunction)
 
 class pcolors:
@@ -140,6 +141,11 @@ def call_fn(name, args):
         case "missingFunction":
             return missingFunction(target_field=args.get("target_field"),
                                    reasoning=args.get("reasoning"))
+        case "complexConversionFunction":
+            return complexConversionFunction(source_field=args.get("source_field"),
+                                             target_field=args.get("target_field"),
+                                             conversion_equation=args.get("conversion_equation"),
+                                             reasoning=args.get("reasoning"))
         case "sendMessageFunction":
             return sendMessageFunction(message=args.get("message"))
                                      
