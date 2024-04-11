@@ -26,48 +26,13 @@ rename power := status | rename brightness := luminosity | switch power ( case "
 
 We refer to this process as *mint*.  A mint operation consists of the following stages.
 
-**S1: Discovery.** Identifying the data sources that are relevant to a data consumer based on the *intent* at the data consumer and the data source's *metadata* such as text description. This stage helps scope down the semantics of the desired schema and can be seen as a pre-filtering step. Data consumer can also use this step to select known data sources.
+**Extraction.** This stage extracts the schemas from the data source and consumer and represent them in a mint intermediate representation (MR). It allows the mint process to handle a diverse set of data sources (e.g., json files, data lakes, databases, API endpoints) while passing on a unified schema format to the next stages._
 
-**S2: Extraction.** This stage extracts the schemas from the data source and consumer and represent them in a mint intermediate representation (MR). It allows the mint process to handle a diverse set of data sources (e.g., json files, data lakes, databases, API endpoints) while passing on a unified schema format to the next stages.
+**Identification.** Given the source and target MRs this stage (i) preprocesses them to generate normalized MRs which are invariant to field ordering, capitalization etc; (ii) decides whether the source-target schema pair has been seen before. If so, skip the following steps and return any cached correspondences or mappings.
 
-**S3: Identification.** Given the source and target MRs this stage (i) preprocesses them to generate normalized MRs which are invariant to field ordering, capitalization etc; (ii) decides whether the source-target schema pair has been seen before. If so, skip the following steps and return any cached correspondences or mappings.
+**Mapping.** Given each correspondence, this step generates a language-neutral transformation between the values and can be seen as a row of a match-action table. 
 
-**S4: Matching.** Find the correspondences between fields in the schemas. This step generates the correspondence between fields. The process also decides whether the schemas are semantically equivalent and/or having semantically equivalent fields, depending on the pre-filtering policy.
-
-**S5: Mapping.** Given each correspondence, this step generates a language-neutral transformation between the values and can be seen as a row of a match-action table. 
-
-**S6: Assembly.** Generates dataflow that coverts fields from source schema to the target schema, given the correspondences. The dataflow language can be specified by the user.
-
-S1-S3 are referred to as the frontend which extracts source schema from desired data sources. S4-S6 are referred to as the backend.  The mapping dataflow can be installed on the data pipeline or used in a query. 
-
-The key piece of design of limit is that each step will leverage as much as data from the data source and the other steps as possible. For example, the mapping stage will not only reuse the correspondences from the matching stage, but it will also look at the source data when it is available.
-
-> TBD We use a technique called *retrospection* which we asks the LLM to go through the generated correspondence to check each field for correctness and tracks any mistakes that we'll use for prompting in the future or rerun the generation at hand. We build this separate module as *retrospect* which can be attached to either of the stages, not only the matching stage.
-
-## Design
-
-Llmint focuses on three objectives: accuracy, performance, and cost.
-
-> JIT data ingestion: A data processing pipeline typically ingests data from predefined data sources only. This limits the types of data it can ingest (i.e., a schema or a set of schemas), because the dataflow operators typically can perform over known fields. Instead, we want the data pipeline to be able to handle more data that are semantically equivalent but with different schemas. This means we want to dynamically adapt the pipeline (i.e., its ingestion component) based on the data source schema.
->
-> Our first approach is provide an interface allowing predefine rules that specify what happens if we see schema that matches known structures and which actions to perform. At run-time, the rules and the schemas of the source and target are given as input to generate the dataflow and prepended to the data pipeline.
->
-> The goal is to achieve a fast, programmable data integration pipeline.
-
-**Accuracy.** 
-
-* Percentage of correct mappings. 
-* Precision:
-* Recall:
-* F1 score:
-
-**Performance.** 
-* Latency: time it takes to finish a mint.
-* Throughput: number of mints per second.
-
-**Cost.** Token-efficiency. 
-
-
+**Assembly.** Generates dataflow that coverts fields from source schema to the target schema, given the correspondences. The dataflow language can be specified by the user.
 
 Llmint exposes the high-level modules with a declarative interface.
 
@@ -75,20 +40,6 @@ Llmint exposes the high-level modules with a declarative interface.
 import llmint
 mint = llmint.new_mint()
 ```
-
-> Difficult cases. 1. Same filed names but refer to different entities. 2. Range differences. 3. Data nested.
-
-> TBD Example selection. Since it's unlikely that all examples are equally useful, llmint allows stateful matching with example selection to improve accuracy and reduce tokens
-
-> TBD Completion model.
-
-> TBD Deducting mapping from the values.
-
-> TBD Semantic handshaking 
-
-> TBD Support additional rules as part of examples
-
-> TBD Small model async access
 
 ## FAQ
 
