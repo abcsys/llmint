@@ -1,7 +1,7 @@
 import json
 from openai import OpenAI
 from util.util import *
-<<<<<<< HEAD
+
 from functions import (doNothingFunction,
                        addOptionalFunction, 
                        changeTypeFunction, 
@@ -17,24 +17,6 @@ from functions import (doNothingFunction,
                        missingFunction,
                        complexConversionFunction,
                        sendMessageFunction)
-=======
-from functions import (
-    doNothingFunction,
-    addOptionalFunction,
-    changeTypeFunction,
-    deleteFunction,
-    renameFunction,
-    setDefaultFunction,
-    applyFuncFunction,
-    mapFunction,
-    scaleFunction,
-    shiftFunction,
-    combineFunction,
-    splitFunction,
-    missingFunction,
-    sendMessageFunction
-)
->>>>>>> 9e1c1aa665390971ef0dceb17c439c1076503db9
 
 doNothing = {
     "type": "function",
