@@ -1,21 +1,5 @@
 import yaml
 import os
-from termcolor import colored
-from functions import (doNothingFunction,
-                       addOptionalFunction, 
-                       changeTypeFunction, 
-                       deleteFunction, 
-                       renameFunction, 
-                       setDefaultFunction, 
-                       applyFuncFunction, 
-                       mapFunction, 
-                       scaleFunction, 
-                       shiftFunction, 
-                       combineFunction, 
-                       splitFunction, 
-                       missingFunction,
-                       complexConversionFunction,
-                       sendMessageFunction)
 
 class pcolors:
     RIGHT = '\033[92m'

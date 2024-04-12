@@ -1,7 +1,7 @@
 import json
 from openai import OpenAI
-from util.util import *
-from functions import *
+from .util.util import *
+from .functions import *
 
 doNothing = {
     "type": "function",

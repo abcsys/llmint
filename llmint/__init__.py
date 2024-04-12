@@ -6,8 +6,8 @@ from llmint import (
     mint,
 )
 
-from mapper import map
-from assembly import assemble
+from .mapper import map
+from .assembly import assemble
 
 __all__ = [
     # modules
