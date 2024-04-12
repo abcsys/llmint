@@ -57,4 +57,11 @@ def map(source_schema, target_schema):
         "role": "user",
         "content": format_source_target(source_schema, target_schema)
     })
-    return function_model(messages)
+    
+    # remove reasoning from output
+    response = function_model(messages)
+    for i in range(len(response)):
+        response[i] = response[i][0]
+        
+    # return a list of mappings
+    return response
