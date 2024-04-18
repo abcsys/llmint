@@ -7,8 +7,8 @@ def doNothingFunction(source_field, target_field, reasoning):
 def addOptionalFunction(target_field, field_type, reasoning):
     return (f'{{from: None, to: {target_field}, transformation: ADD {target_field} TYPE {field_type}}}', reasoning)   
 
-def changeTypeFunction(source_field, target_field, source_type, target_type, reasoning):
-    return (f'{{from: {source_field}, to: {target_field}, transformation: CHANGE TYPE {source_field} FROM {source_type} TO {target_type}}}', reasoning)
+def castFunction(source_field, target_field, source_type, target_type, reasoning):
+    return (f'{{from: {source_field}, to: {target_field}, transformation: CAST {source_field} FROM {source_type} TO {target_type}}}', reasoning)
 
 def deleteFunction(source_field, reasoning):
     return (f'{{from: {source_field}, to: None, transformation: DELETE {source_field}}}', reasoning)
@@ -53,15 +53,9 @@ def complexConversionFunction(source_field, target_field, conversion_equation, r
 def sendMessageFunction(message):
     return (message, "No reasoning")
 
-
-
-
-
-
-
-
-
-
+# ------------------------------------------------------------------------
+# Function Calling
+# ------------------------------------------------------------------------
 def call_fn(name, args):
     match name:
         case "doNothingFunction":
@@ -72,8 +66,8 @@ def call_fn(name, args):
             return addOptionalFunction(target_field=args.get("target_field"), 
                                        field_type=args.get("field_type"),
                                        reasoning=args.get("reasoning"))
-        case "changeTypeFunction":
-            return changeTypeFunction(source_field=args.get("source_field"),
+        case "castFunction":
+            return castFunction(source_field=args.get("source_field"),
                                       target_field=args.get("target_field"),
                                       source_type=args.get("source_type"),
                                       target_type=args.get("target_type"),

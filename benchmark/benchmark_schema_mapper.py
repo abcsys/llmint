@@ -13,7 +13,7 @@ motion_sensor_dataset = os.path.join(
 motion_sensor_mappings = os.path.join(
     __dir__, "..", "..",
     "mint-sample-data",
-    "schema", "motion_sensors_mappings.yaml"
+    "schema", "motionsensors_mappings.yaml"
 )
 
 # load llmint_base instructions

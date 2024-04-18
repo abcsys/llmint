@@ -55,10 +55,10 @@ addOptional = {
     }
 }
 
-changeType = {
+cast = {
     "type": "function",
     "function": {
-        "name": "changeTypeFunction",
+        "name": "castFunction",
         "description": "Change the type of the source field",
         "parameters": {
             "type": "object",
@@ -431,7 +431,7 @@ sendMessage = {
 
 tools = [doNothing,
          addOptional,
-         changeType,
+         cast,
          delete,
          rename,
          set_default,
@@ -472,7 +472,7 @@ def function_model(messages):
         available_functions = {
             "doNothingFunction": doNothingFunction,
             "addOptionalFunction": addOptionalFunction,
-            "changeTypeFunction": changeTypeFunction,
+            "castFunction": castFunction,
             "deleteFunction": deleteFunction,
             "renameFunction": renameFunction,
             "setDefaultFunction": setDefaultFunction,
