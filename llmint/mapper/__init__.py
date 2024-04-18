@@ -1,4 +1,4 @@
-from .functions import map
+from llmint.mapper.command import map
 
 __all__ = [
     'map',

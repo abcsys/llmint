@@ -1,6 +1,7 @@
 import os
-from llmint.mapper.functions.function_model import *
-from llmint.mapper.functions.util.util import *
+
+import llmint.mapper.command.model as model
+import llmint.mapper.command.util as util
 
 __dir__ = os.path.dirname(__file__)
 # load schema training examples
@@ -16,58 +17,13 @@ motion_sensor_mappings = os.path.join(
     "schema", "motionsensors_mappings.yaml"
 )
 
-# load llmint_base instructions
-llmint_base = os.path.join(
-    __dir__, "..",
-    "llmint",
-    "mapper",
-    "functions",
-    "instructions",
-    "llmint_base.txt",
-)
-
-# load stl_base instructions
-stl_base = os.path.join(
-    __dir__, "..",
-    "llmint",
-    "mapper",
-    "functions",
-    "instructions",
-    "stl_base.txt",
-)
-
-# load end_base instructions
-end_base = os.path.join(
-    __dir__, "..",
-    "llmint",
-    "mapper",
-    "functions",
-    "instructions",
-    "end_base.txt",
-)
-
-example_schemas = from_yaml(motion_sensor_dataset)
-example_mappings = from_yaml(motion_sensor_mappings)
+example_schemas = util.from_yaml(motion_sensor_dataset)
+example_mappings = util.from_yaml(motion_sensor_mappings)
 num_examples = len(example_schemas)
 num_tests = len(example_mappings)
 
-# general instructional message sent to the model
-with open(llmint_base) as f:
-    messages = [{"role": "system",
-                "content": f.read()
-               }]
-
-# STL instructional message sent to the model
-with open(stl_base) as f:
-    messages.append({"role": "system",
-                     "content": f.read()
-                    })
-    
-# end instructional message sent to the model
-with open(end_base) as f:
-    messages.append({"role": "system",
-                     "content": f.read()
-                    })
+messages = []
+util.get_system_prompt(messages)
 
 def zero_shot_benchmark():
     print("========== Zero Shot Benchmarking for motionsensors.yaml ==========", flush=True)
@@ -77,11 +33,11 @@ def zero_shot_benchmark():
         # user message
         zero_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = function_model(zero_shot_messages)
-        accuracy(responses, i, example_mappings)
+        responses = model.call(zero_shot_messages)
+        util.accuracy(responses, i, example_mappings)
         print(f"-------------------------------------------------------------", flush=True)
     for i in range(3):
         print(f"---------- Running Example {i + 3} {str(example_schemas[i]["name"])} to {str(example_schemas[i - 1]["name"])} ----------", flush=True)
@@ -89,11 +45,11 @@ def zero_shot_benchmark():
         # user message
         zero_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[i]), 
+                                    "content": util.format_source_target(str(example_schemas[i]), 
                                                                     str(example_schemas[i - 1]))
                                  })
-        responses = function_model(zero_shot_messages)
-        accuracy(responses, i + 3, example_mappings)
+        responses = model.call(zero_shot_messages)
+        util.accuracy(responses, i + 3, example_mappings)
         print(f"-------------------------------------------------------------", flush=True)
     print("=========================================================", flush=True)
 
@@ -106,7 +62,7 @@ def one_shot_benchmark():
         # first example
         one_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[(i + 1) % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[(i + 1) % num_examples]), 
                                                                     str(example_schemas[(i + 2) % num_examples]))
                                  })
         one_shot_messages.append({
@@ -116,11 +72,11 @@ def one_shot_benchmark():
         # user message
         one_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = function_model(one_shot_messages)
-        print("Accuracy: ", accuracy(responses, i, example_mappings))
+        responses = model.call(one_shot_messages)
+        print("Accuracy: ", util.accuracy(responses, i, example_mappings))
         print(f"------------------------------")
     print("========================================")
     
@@ -133,7 +89,7 @@ def two_shot_benchmark():
         # first example
         two_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[(i + 1) % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[(i + 1) % num_examples]), 
                                                                     str(example_schemas[(i + 2) % num_examples]))
                                  })
         two_shot_messages.append({
@@ -143,7 +99,7 @@ def two_shot_benchmark():
         # second example
         two_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[(i + 2) % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[(i + 2) % num_examples]), 
                                                                     str(example_schemas[(i + 3) % num_examples]))
                                  })
         two_shot_messages.append({
@@ -153,11 +109,11 @@ def two_shot_benchmark():
         # user message
         two_shot_messages.append({
                                     "role": "user",
-                                    "content": format_source_target(str(example_schemas[i % num_examples]), 
+                                    "content": util.format_source_target(str(example_schemas[i % num_examples]), 
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
-        responses = function_model(two_shot_messages)
-        print("Accuracy: ", accuracy(responses, i, example_mappings))
+        responses = model.call(two_shot_messages)
+        print("Accuracy: ", util.accuracy(responses, i, example_mappings))
         print(f"------------------------------")
     print("========================================")
 
