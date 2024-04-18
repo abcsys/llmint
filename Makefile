@@ -6,6 +6,10 @@ install:
 	pip install -e . && rm -rf *.egg-info
 	mkdir -p ~/.llmint && touch ~/.llmint/config.yaml
 
+.PHONY: run
+run:
+	python examples/map.py
+
 .PHONY: benchmark_match, benchmark_mapper, test
 benchmark_match:
 	python -m benchmark.benchmark_record_match

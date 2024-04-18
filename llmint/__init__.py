@@ -1,7 +1,6 @@
 from llmint import (
     assembly,
     extract,
-    identify,
     mapper,
     mint,
 )
@@ -13,7 +12,6 @@ __all__ = [
     # modules
     "assembly",
     "extract",
-    "identify",
     "mapper",
     "mint",
     # methods
