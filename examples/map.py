@@ -1,5 +1,10 @@
 import llmint
 
+"""
+    Run python -m  examples.map from root llmint directory
+"""
+
+
 def main():
     source_schema = """
     - name: "Philips Hue Color Bulb"

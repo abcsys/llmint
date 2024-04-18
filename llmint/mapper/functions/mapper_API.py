@@ -35,4 +35,4 @@ def mapper_API(file, include_reasoning=False):
     response = function_model(messages)
     print_responses(response, include_reasoning)
 
-mapper_API("mapper_input.yaml", True)
+mapper_API("../../../mint-sample-data/schema/test_sample/mapper_input.yaml", True)

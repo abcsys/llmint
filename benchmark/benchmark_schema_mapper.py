@@ -1,39 +1,70 @@
 import os
-from function_model import *
-from util.util import *
+from llmint.mapper.functions.function_model import *
+from llmint.mapper.functions.util.util import *
 
 __dir__ = os.path.dirname(__file__)
 # load schema training examples
 motion_sensor_dataset = os.path.join(
-    __dir__, "..", "..", "..", "..", 
+    __dir__, "..", "..", 
     "mint-sample-data",
     "schema", "motionsensors.yaml"
 )
 # load schema testing examples
 motion_sensor_mappings = os.path.join(
-    __dir__, "..", "..", "..", "..",
+    __dir__, "..", "..",
     "mint-sample-data",
     "schema", "motion_sensors_mappings.yaml"
 )
+
+# load llmint_base instructions
+llmint_base = os.path.join(
+    __dir__, "..",
+    "llmint",
+    "mapper",
+    "functions",
+    "instructions",
+    "llmint_base.txt",
+)
+
+# load stl_base instructions
+stl_base = os.path.join(
+    __dir__, "..",
+    "llmint",
+    "mapper",
+    "functions",
+    "instructions",
+    "stl_base.txt",
+)
+
+# load end_base instructions
+end_base = os.path.join(
+    __dir__, "..",
+    "llmint",
+    "mapper",
+    "functions",
+    "instructions",
+    "end_base.txt",
+)
+
 example_schemas = from_yaml(motion_sensor_dataset)
 example_mappings = from_yaml(motion_sensor_mappings)
 num_examples = len(example_schemas)
 num_tests = len(example_mappings)
 
 # general instructional message sent to the model
-with open("instructions/llmint_base.txt") as f:
+with open(llmint_base) as f:
     messages = [{"role": "system",
                 "content": f.read()
                }]
 
 # STL instructional message sent to the model
-with open("instructions/stl_base.txt") as f:
+with open(stl_base) as f:
     messages.append({"role": "system",
                      "content": f.read()
                     })
     
 # end instructional message sent to the model
-with open("instructions/end_base.txt") as f:
+with open(end_base) as f:
     messages.append({"role": "system",
                      "content": f.read()
                     })

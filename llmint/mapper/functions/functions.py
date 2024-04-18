@@ -2,7 +2,7 @@
 # Field Transformation Tools
 # ------------------------------------------------------------------------
 def doNothingFunction(source_field, target_field, reasoning):
-    return (f'{{from: {source_field}, to: {target_field}, transformation: DO NOTHING}}', reasoning)   
+    return (f'{{from: {source_field}, to: {target_field}, transformation: KEEP}}', reasoning)   
 
 def addOptionalFunction(target_field, field_type, reasoning):
     return (f'{{from: None, to: {target_field}, transformation: ADD {target_field} TYPE {field_type}}}', reasoning)   

@@ -2,7 +2,6 @@ import os
 from .function_model import *
 from .util.util import *
 
-
 def map_from_file(file, include_reasoning=False):
     """ Return the mapping for a given source schema and target schema.
     
