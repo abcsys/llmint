@@ -24,11 +24,13 @@ def map(source_schema, target_schema):
     messages = []
     util.get_system_prompt(messages)
     util.get_user_prompt(messages, source_schema, target_schema)
-    
+
     # remove reasoning from output
     response = model.call(messages)
+    """
     for i in range(len(response)):
         response[i] = response[i][0]
+    """
         
     # return a list of mappings
     return response

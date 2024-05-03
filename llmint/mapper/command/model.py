@@ -1,4 +1,5 @@
 import json
+import time
 from openai import OpenAI
 
 import llmint.mapper.command.util as util
@@ -54,6 +55,9 @@ def missingFunction(target_field, reasoning):
 
 def complexConversionFunction(source_field, target_field, conversion_equation, reasoning):
     return (f'{{from: {source_field}, to: {target_field}, transformation: CONVERT {conversion_equation}}}', reasoning)
+
+def incompatibleFunction(reasoning):
+    return (f'{{from: None, to: None, transformation: INCOMPATIBLE SCHEMAS}}', reasoning)
 
 def sendMessageFunction(message):
     return (message, "No reasoning")
@@ -130,6 +134,8 @@ def call_fn(name, args):
                                              target_field=args.get("target_field"),
                                              conversion_equation=args.get("conversion_equation"),
                                              reasoning=args.get("reasoning"))
+        case "incompatibleFunction":
+            return incompatibleFunction(reasoning=args.get("reasoning"))
         case "sendMessageFunction":
             return sendMessageFunction(message=args.get("message"))
                                      
@@ -545,6 +551,24 @@ complexConversion = {
         }
     }
 
+incompatible = {
+    "type": "function",
+    "function": {
+        "name": "incompatibleFunction",
+        "description": "Indicates the input schemas are for different product types",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "reasoning": {
+                    "type": "string", 
+                    "description": "In-depth reasoning as to why you chose this function",
+                },
+            },
+            "required": ["reasoning"],
+        },
+    }
+}
+
 sendMessage = {
     "type": "function",
     "function": {
@@ -582,6 +606,7 @@ command = [
     split,
     missing,
     complexConversion,
+    incompatible,
     sendMessage
         ]
 
@@ -590,7 +615,10 @@ model = "gpt-4-1106-preview"
 
 #https://platform.openai.com/docs/guides/function-calling
 def call(messages):
-    print("Running on model", model)
+    # Start timing
+    start_time = time.time()
+    print("Running on model", model, flush=True)
+    
     # Step 1: send the conversation and available functions to the model
     client = OpenAI(api_key=util.get_openai_api_key())
 
@@ -601,11 +629,16 @@ def call(messages):
         temperature=0,
         tool_choice="auto",  # auto is default, but we'll be explicit
     )
+    
+    end_time = time.time()
+    print(f"Generating response took {end_time - start_time: .2f} seconds")
+    
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
     function_responses = []
 
     # Step 2: check if the model wanted to call a function
+    start_time = time.time()
     if tool_calls:
         # Step 3: call the function
         # Note: the JSON response may not always be valid; be sure to handle errors
@@ -624,11 +657,12 @@ def call(messages):
             "splitFunction": splitFunction,
             "missingFunction": missingFunction,
             "complexConversionFunction": complexConversionFunction,
+            "incompatibleFunction": incompatibleFunction,
             "sendMessageFunction": sendMessageFunction,
         }
         messages.append(response_message)  # extend conversation with assistant's reply
         # Step 4: send the info for each function call and function response to the model
-        print("LLMint calls", len(tool_calls), "functions")
+        print("LLMint calls", len(tool_calls), "functions", flush=True)
         for tool_call in tool_calls:
             function_name = tool_call.function.name
             function_to_call = available_functions[function_name]
@@ -644,5 +678,9 @@ def call(messages):
                 }
             )  # extend conversation with function response
         # return function_responses
-        print("Token Usage: ", response.usage)
+        print("Token Usage: ", response.usage, flush=True)
+        
+    end_time = time.time()
+    print(f"Calling functions took {end_time - start_time: .2f} seconds")
+    
     return function_responses
