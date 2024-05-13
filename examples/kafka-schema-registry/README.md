@@ -1,22 +1,22 @@
-# Installation
+# Kafka and Confluent
 
-## Kafka
+Installation.
+
+### Kafka
 
 Download Kafka from [here](https://kafka.apache.org/downloads).
 
-## Confluent
+### Confluent
 
 Download Confluent from [here](https://www.confluent.io/download/).
 
-## Confluent python client
+### Confluent python client
 
 Install the confluent python client:
 
 ```bash
 pip install confluent_kafka
 ```
-
-```bash
 
 # Setup
 
@@ -40,5 +40,11 @@ Run schema registry:
 
 ```bash
 bin/schema-registry-start etc/schema-registry/schema-registry.properties
+```
+
+# Run example
+
+```bash
+make run
 ```
 
