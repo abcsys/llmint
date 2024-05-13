@@ -1,3 +1,23 @@
+# Installation
+
+## Kafka
+
+Download Kafka from [here](https://kafka.apache.org/downloads).
+
+## Confluent
+
+Download Confluent from [here](https://www.confluent.io/download/).
+
+## Confluent python client
+
+Install the confluent python client:
+
+```bash
+pip install confluent_kafka
+```
+
+```bash
+
 # Setup
 
 In /kafka:

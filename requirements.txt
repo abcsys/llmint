@@ -2,4 +2,4 @@ openai
 pyyaml
 numpy
 langchain
-confluent-kafka
+confluent-kafka[avro]
