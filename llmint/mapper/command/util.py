@@ -123,10 +123,17 @@ def accuracy(results, example_num, example_mappings):
         if i in correctIdxs:
             print(pcolors.RIGHT + str(example_mappings[example_num]["mapping"][i]).replace("'", "") + pcolors.ENDC, flush=True)
         else:
-            print(pcolors.MISSING + str(example_mappings[example_num]["mapping"][i]).replace("'", "") + pcolors.ENDC, flush=True)           
-    print("Recall: ", len(correctIdxs), "/", len(example_mappings[example_num]["mapping"]), flush=True)
-    print("Precision: ", len(correctIdxs), "/", len(results), flush=True)
+            print(pcolors.MISSING + str(example_mappings[example_num]["mapping"][i]).replace("'", "") + pcolors.ENDC, flush=True)    
+    
+    precision = len(correctIdxs) / len(results)       
+    recall = len(correctIdxs) / len(example_mappings[example_num]["mapping"])
+    f1 = 2 * ((precision * recall) / (precision + recall))
+    
+    print("Precision: ", precision, flush=True)
+    print("Recall: ", recall, flush=True)
+    print("F1: ", f1, flush=True)
     print("Total: ", numCorrect, "/", total, flush=True)
+    return precision, recall, f1
         
 def print_responses(response, include_reasoning):
     """

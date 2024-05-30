@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex HTML Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="2">Source Schema</th>
+                <th rowspan="2">Target Schema</th>
+                <th colspan="2">Precision</th>
+                <th colspan="2">Recall</th>
+                <th colspan="2">F1</th>
+            </tr>
+            <tr>
+                <th>llmint</th>
+                <th>base</th>
+                <th>llmint</th>
+                <th>base</th>
+                <th>llmint</th>
+                <th>base</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SimpliSafe</td>
+                <td>Vivint</td>
+                <td>1.00</td>
+                <td>0.75</td>
+                <td>0.80</td>
+                <td>0.6</td>
+                <td>0.89</td>
+                <td>0.33</td>
+            </tr>
+            <tr>
+                <td>Vivint</td>
+                <td>Philips Hue</td>
+                <td>0.95</td>
+                <td>1.0</td>
+                <td>0.94</td>
+                <td>1.0</td>
+                <td>0.94</td>
+                <td>1.0</td>
+            </tr>
+            <tr>
+                <td>Philips Hue</td>
+                <td>Simplisafe</td>
+                <td>0.74</td>
+                <td>0.6</td>
+                <td>0.84</td>
+                <td>0.75</td>
+                <td>0.78</td>
+                <td>0.33</td>
+            </tr>
+            <tr>
+                <td>Simplisafe</td>
+                <td>Philips Hue</td>
+                <td>1.0</td>
+                <td>0.8</td>
+                <td>0.9</td>
+                <td>0.67</td>
+                <td>0.95</td>
+                <td>0.36</td>
+            </tr>
+            <tr>
+                <td>Vivint</td>
+                <td>Simplisafe</td>
+                <td>0.57</td>
+                <td>0.2</td>
+                <td>0.45</td>
+                <td>0.25</td>
+                <td>0.50</td>
+                <td>0.11</td>
+            </tr>
+            <tr>
+                <td>Philips Hue</td>
+                <td>Vivint</td>
+                <td>0.91</td>
+                <td>0.6</td>
+                <td>0.98</td>
+                <td>0.75</td>
+                <td>0.94</td>
+                <td>0.33</td>
+            </tr>
+            <!-- Add more rows as necessary -->
+        </tbody>
+    </table>
+</body>
+</html>
