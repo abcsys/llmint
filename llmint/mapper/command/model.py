@@ -607,7 +607,7 @@ command = [
     missing,
     complexConversion,
     incompatible,
-    sendMessage
+    #sendMessage
         ]
 
 # model = "gpt-3.5-turbo-1106"
@@ -630,8 +630,8 @@ def call(messages):
         tool_choice="auto",  # auto is default, but we'll be explicit
     )
     
-    end_time = time.time()
-    print(f"Generating response took {end_time - start_time: .2f} seconds")
+    response_time = round(time.time() - start_time, 3)
+    print(f"Generating response took {response_time} seconds")
     
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
@@ -680,7 +680,7 @@ def call(messages):
         # return function_responses
         print("Token Usage: ", response.usage, flush=True)
         
-    end_time = time.time()
-    print(f"Calling functions took {end_time - start_time: .2f} seconds")
+    function_time = round(time.time() - start_time, 3)
+    print(f"Calling functions took {function_time} seconds")
     
-    return function_responses
+    return (function_responses, response.usage, response_time, function_time)

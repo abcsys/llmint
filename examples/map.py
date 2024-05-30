@@ -13,24 +13,24 @@ def main():
 
 
 source_schema = """
-- name: "Philips Hue Color Bulb"
-  kind: "light_bulb"
-  description: "RGB color smart light bulb with adjustable brightness."
+- name: "Vivint"
+  kind: "motion sensor"
+  description: "Attributes for the Vivint motion sensor system."
   fields:
-  - name: "color"
-    type: "string"
-    description: "Hexadecimal color value for the bulb."
-    required: false
+    - name: "triggered"
+      type: "boolean"
+      description: "Indicates whether the sensor has been triggered."
+      required: true
 
-  - name: "brightness"
-    type: "integer"
-    description: "Brightness level from 0 to 100."
-    required: true
+    - name: "enabled"
+      type: "boolean"
+      description: "Indicates whether the motion sensor is enabled (True) or bypassed (False)."
+      required: true
 
-  - name: "power_state"
-    type: "boolean"
-    description: "True if the light is on, false if off."
-    required: true
+    - name: "battery_level_percentage"
+      type: "integer"
+      description: "Measures the current battery level of the motion sensor."
+      required: true
 """
 
 target_schema = """

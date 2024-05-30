@@ -26,6 +26,9 @@ messages = []
 util.get_system_prompt(messages)
 
 def zero_shot_benchmark():
+    all_precision = []
+    all_recall = []
+    all_f1 = []
     print("========== Zero Shot Benchmarking for motionsensors.yaml ==========", flush=True)
     for i in range(3):
         print(f"---------- Running Example {i} {str(example_schemas[i % num_examples]["name"])} to {str(example_schemas[(i + 1) % num_examples]["name"])} ----------", flush=True)
@@ -37,7 +40,10 @@ def zero_shot_benchmark():
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
         responses = model.call(zero_shot_messages)
-        util.accuracy(responses, i, example_mappings)
+        precision, recall, f1 = util.accuracy(responses[0], i, example_mappings)
+        all_precision.append(precision)
+        all_recall.append(recall)
+        all_f1.append(f1)
         print(f"-------------------------------------------------------------", flush=True)
     for i in range(3):
         print(f"---------- Running Example {i + 3} {str(example_schemas[i]["name"])} to {str(example_schemas[i - 1]["name"])} ----------", flush=True)
@@ -49,10 +55,33 @@ def zero_shot_benchmark():
                                                                     str(example_schemas[i - 1]))
                                  })
         responses = model.call(zero_shot_messages)
-        util.accuracy(responses, i + 3, example_mappings)
+        precision, recall, f1 = util.accuracy(responses[0], i + 3, example_mappings)
+        all_precision.append(precision)
+        all_recall.append(recall)
+        all_f1.append(f1)
         print(f"-------------------------------------------------------------", flush=True)
     print("=========================================================", flush=True)
+    return all_precision, all_recall, all_f1
 
+def multi_zero_shot_benchmark(num_runs):
+    total_precision = [0] * 6
+    total_recall = [0] * 6
+    total_f1 = [0] * 6
+    
+    for i in range(num_runs):
+        precision, recall, f1 = zero_shot_benchmark()
+        total_precision = [a + b for a, b in zip(total_precision, precision)]
+        total_recall = [a + b for a, b in zip(total_recall, recall)]
+        total_f1 = [a + b for a, b in zip(total_f1, f1)]
+        print(total_precision, total_recall, total_f1)
+    
+    print("Average Precision: ", [p / num_runs for p in total_precision], flush=True)
+    print("Average Recall: ", [r / num_runs for r in total_recall], flush=True)
+    print("Average F1: ", [f / num_runs for f in total_f1], flush=True)
+        
+    
+
+"""
 def one_shot_benchmark():
     print("========== One Shot Benchmarking for motionsensors.yaml ==========")
     for i in range(len(example_schemas)):
@@ -76,7 +105,7 @@ def one_shot_benchmark():
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
         responses = model.call(one_shot_messages)
-        print("Accuracy: ", util.accuracy(responses, i, example_mappings))
+        print("Accuracy: ", util.accuracy(responses[0], i, example_mappings))
         print(f"------------------------------")
     print("========================================")
     
@@ -113,8 +142,10 @@ def two_shot_benchmark():
                                                                     str(example_schemas[(i + 1) % num_examples]))
                                  })
         responses = model.call(two_shot_messages)
-        print("Accuracy: ", util.accuracy(responses, i, example_mappings))
+        print("Accuracy: ", util.accuracy(responses[0], i, example_mappings))
         print(f"------------------------------")
     print("========================================")
+"""
 
-zero_shot_benchmark()
+# zero_shot_benchmark()
+multi_zero_shot_benchmark(20)

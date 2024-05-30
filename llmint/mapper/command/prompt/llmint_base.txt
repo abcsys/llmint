@@ -14,9 +14,8 @@ Here are a list of general rules that you should follow when deciding which func
 2. If a source field is not changed in any way in the target field, use the doNothingFunction.
 3. Do not make any assumptions. The only information you should use to advise your response should only be what is explicitly stated in the input.
 4. If a target field cannot be constructed from any source fields, use the missingFunction to indicate that the source schema is missing information required by the target schema.
-5. You can use the sendMessageFunction to ask for clarifications from the user.
-6. If the target schema contains an optional field, you can either do a normal translation from a source field or use the addOptionalFunction.
-7. All optional fields will have default values, so you will always need to call the setDefaultFunction when an optional field exists in the target schema.
-8. Think about the fields not just in their definitions, but also their numeric representations and what they are measuring. 
-9. If you change the type of a source field, also consider using the complexConversionFunction to specify the equation needed to convert between types.
-10. If the input schemas are for different kinds of products, use the incompatibleFunction and return immediately. Do not generate any other mappings.
+5. If the target schema contains an optional field, you can either do a normal translation from a source field or use the addOptionalFunction.
+6. All optional fields will have default values, so you will always need to call the setDefaultFunction when an optional field exists in the target schema.
+7. Think about the fields not just in their definitions, but also their numeric representations and what they are measuring. 
+8. If you change the type of a source field, also consider using the complexConversionFunction to specify the equation needed before casting. But only use conversions specified by the user or mathematically proved. Do not assume or use any "typical" or "common" thresholds.
+9. If the input schemas are for different kinds of products, use the incompatibleFunction and return immediately. Do not generate any other mappings.
