@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="llmint",
-    version="0.0.2",
+    version="0.0.3",
     description="Llmint python library",
     author="Llmint Team",
     author_email="silveryfu@gmail.com",
