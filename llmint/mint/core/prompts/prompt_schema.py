@@ -1,3 +1,0 @@
-"""
-Mint data schema.
-"""

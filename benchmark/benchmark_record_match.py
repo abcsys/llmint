@@ -3,11 +3,10 @@ from benchmark import util
 from benchmark.log import (
     init_logger, log_name, log, header
 )
-import numpy as np
 
 from llmint.extract import from_mint_sample
-from llmint.match.record import RecordChatMatch, RecordPromptMatch
-import llmint.match.util as match_util
+from llmint.map.stl.match import RecordChatMatch, RecordPromptMatch
+import llmint.map.stl.match.util as match_util
 
 __dir__ = os.path.dirname(__file__)
 __log_dir__ = os.path.join(__dir__, "logs")

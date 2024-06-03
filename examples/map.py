@@ -1,7 +1,6 @@
 import llmint
 import pprint as pp
 
-
 """
     Run python -m  examples.map from root llmint directory
 """
