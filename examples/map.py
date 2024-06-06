@@ -1,15 +1,11 @@
 import llmint
+from llmint.core.eval import print_mappings
 import pprint as pp
 
 
-"""
-    Run python -m  examples.map from root llmint directory
-"""
-
-
 def main():
-    mappings: list = llmint.map(source_schema, target_schema)
-    pp.pprint(mappings)
+    mappings = llmint.map(source_schema, target_schema)
+    print_mappings(mappings)
 
 
 source_schema = """

@@ -3,3 +3,5 @@ pyyaml
 numpy
 langchain
 confluent-kafka[avro]
+pyzed
+libem
