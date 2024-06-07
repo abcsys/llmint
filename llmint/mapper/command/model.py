@@ -683,4 +683,4 @@ def call(messages):
     function_time = round(time.time() - start_time, 3)
     print(f"Calling functions took {function_time} seconds")
     
-    return (function_responses, response.usage, response_time, function_time)
+    return (function_responses, response.usage.total_tokens, response_time, function_time)

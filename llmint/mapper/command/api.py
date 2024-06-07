@@ -1,4 +1,5 @@
 import llmint.mapper.command.model as model
+import llmint.mapper.command.base_model as base_model
 import llmint.mapper.command.util as util
 
 def map_with_reasoning(file, include_reasoning=False):
@@ -49,3 +50,6 @@ def map(source_schema, target_schema, include_reasoning=False, include_info=Fals
     if include_info:
         return response_info
     return response_info[0]
+
+def base_model_map(source_schema, target_schema):
+    return base_model.call(source_schema, target_schema)

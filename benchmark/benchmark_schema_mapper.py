@@ -1,6 +1,7 @@
 import os
 
 import llmint.mapper.command.model as model
+import llmint.mapper.command.base_model as base_model
 import llmint.mapper.command.util as util
 
 __dir__ = os.path.dirname(__file__)
@@ -79,7 +80,21 @@ def multi_zero_shot_benchmark(num_runs):
     print("Average Recall: ", [r / num_runs for r in total_recall], flush=True)
     print("Average F1: ", [f / num_runs for f in total_f1], flush=True)
         
-    
+def base_benchmark(usage_filename, latency_filename):
+    print("========== Zero Shot Base Model Benchmarking for motionsensors.yaml ==========", flush=True)
+    for i in range(3):
+        print(f"---------- Running Example {i} {str(example_schemas[i % num_examples]["name"])} to {str(example_schemas[(i + 1) % num_examples]["name"])} ----------", flush=True)
+        source_schema = str(example_schemas[i % num_examples])
+        target_schema = str(example_schemas[(i + 1) % num_examples])
+        base_model.call(source_schema, target_schema)
+        print(f"-------------------------------------------------------------", flush=True)
+    for i in range(3):
+        print(f"---------- Running Example {i + 3} {str(example_schemas[i]["name"])} to {str(example_schemas[i - 1]["name"])} ----------", flush=True)
+        source_schema = str(example_schemas[i])
+        target_schema = str(example_schemas[i - 1])
+        base_model.call(source_schema, target_schema)
+        print(f"-------------------------------------------------------------", flush=True)
+    print("=========================================================", flush=True)
 
 """
 def one_shot_benchmark():
@@ -148,4 +163,5 @@ def two_shot_benchmark():
 """
 
 # zero_shot_benchmark()
-multi_zero_shot_benchmark(20)
+# multi_zero_shot_benchmark(20)
+base_benchmark()
