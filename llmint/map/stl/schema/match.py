@@ -8,7 +8,7 @@ def func(source_schema, target_schema):
     return libem_match.func(
         left=source_schema,
         right=target_schema
-    ) == "yes"
+    )["answer"] == "yes"
 
 
 def output():
