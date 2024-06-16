@@ -1,4 +1,4 @@
-name = "DEFAULT"
+name = "RENAME"
 schema = {
     "type": "function",
     "function": {
