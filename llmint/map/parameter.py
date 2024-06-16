@@ -1,7 +1,6 @@
 model = "gpt-4o"
 temperature = 0.0
 seed = 42
-verbose = False
 
 tools = [
     # schema match
