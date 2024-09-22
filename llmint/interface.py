@@ -1,4 +1,4 @@
-from llmint.map.stl.schema.match import func as match_func
+from llmint.map.schema import func as match_func
 from llmint.map.function import map as map_func
 
 
