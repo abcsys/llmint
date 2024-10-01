@@ -1,7 +1,6 @@
 from llmint.core import model
 from llmint.map import prompt, parameter
 
-
 def map(source_schema, target_schema):
     mappings = model.call(
         prompt=[
