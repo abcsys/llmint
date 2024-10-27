@@ -38,3 +38,6 @@ def from_yaml(filepath):
     """Load a YAML file and return the data."""
     with open(filepath, 'r') as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
+    
+def format_source_target(source, target):
+    return "Source Schema: " + source + "\nTarget Schema: " + target
