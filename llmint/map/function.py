@@ -15,5 +15,5 @@ def map(source_schema, target_schema):
         temperature=parameter.temperature,
         seed=parameter.seed,
         max_model_call=1,  # only one model call
-    )["tool_outputs"]
+    )["tool_outputs"][0] # take the first tool output
     return mappings
