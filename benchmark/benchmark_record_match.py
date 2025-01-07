@@ -5,8 +5,8 @@ from benchmark.log import (
 )
 
 from llmint.extract import from_mint_sample
-from llmint.map.stl.match import RecordChatMatch, RecordPromptMatch
-import llmint.map.stl.match.util as match_util
+from llmint.map.transform.match import RecordChatMatch, RecordPromptMatch
+import llmint.map.transform.match.util as match_util
 
 __dir__ = os.path.dirname(__file__)
 __log_dir__ = os.path.join(__dir__, "logs")
