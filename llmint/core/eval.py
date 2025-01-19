@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 class pcolors:
     RIGHT = '\033[92m'
     WRONG = '\033[91m'
@@ -43,13 +46,11 @@ def accuracy(output: list, test_example: list):
         f1 = 0
     return precision, recall, f1
 
-def print_mappings(mappings: dict, include_reasoning=True):
-    for name, response in mappings.items():
-        mapping, reasoning = response
-        if include_reasoning:
-
-            print(pcolors.RIGHT + mapping + pcolors.ENDC + '\n',
-                  reasoning, flush=True)
-        else:
-            print(pcolors.RIGHT + mapping + pcolors.ENDC,
-                  flush=True)
+def print_mappings(mappings: list[Map], include_reasoning=True):
+    for mapping in mappings:
+            if include_reasoning:
+                print(pcolors.RIGHT + mapping.__dict__ + pcolors.ENDC + '\n',
+                    mapping.reasoning, flush=True)
+            else:
+                print(pcolors.RIGHT + mapping.__dict__ + pcolors.ENDC,
+                    flush=True)

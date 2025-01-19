@@ -18,6 +18,7 @@ producer = SerializingProducer(config)
 
 # Updated user data to be sent with the new schema
 user_data = {"name": "Jane Doe", "age": 27, "email": "janedoe@example.com"}
+print("User:", user_data)
 
 # Produce message
 producer.produce(topic='user-info', key=str(user_data['name']), value=user_data)

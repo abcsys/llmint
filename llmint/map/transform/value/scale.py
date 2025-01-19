@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "SCALE"
 schema = {
     "type": "function",
@@ -31,6 +34,7 @@ schema = {
 
 
 def func(source_field, target_field, factor, reasoning):
-    return (
-        f'{{from: {source_field}, to: {target_field}, '
-        f'transformation: SCALE {source_field} BY {factor}}}', reasoning)
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'SCALE BY {factor}',
+               reasoning=reasoning)

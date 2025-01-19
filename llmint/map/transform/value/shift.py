@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "SHIFT"
 schema = {
     "type": "function",
@@ -31,5 +34,7 @@ schema = {
 
 
 def func(source_field, target_field, value, reasoning):
-    return (f'{{from: {source_field}, to: {target_field}, '
-            f'transformation: SHIFT {source_field} BY {value}}}', reasoning)
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'SHIFT BY {value}',
+               reasoning=reasoning)

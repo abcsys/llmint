@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "LINK"
 schema = {
     "type": "function",
@@ -34,7 +37,7 @@ schema = {
 }
 
 def func(source_field, target_field, old_value, new_value, reasoning):
-    return (
-    f'{{from: {source_field}, to: {target_field}, '
-    f'transformation: LINK {source_field} "{old_value}" TO "{new_value}"}}',
-    reasoning)
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'LINK {source_field} "{old_value}" TO "{new_value}"',
+               reasoning=reasoning)

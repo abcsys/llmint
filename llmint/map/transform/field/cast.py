@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "CAST"
 schema = {
     "type": "function",
@@ -35,5 +38,7 @@ schema = {
 
 
 def func(source_field, target_field, source_type, target_type, reasoning):
-    return (f'{{from: {source_field}, to: {target_field}, '
-            f'transformation: CAST {source_field} FROM {source_type} TO {target_type}}}', reasoning)
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'CAST FROM {source_type} TO {target_type}',
+               reasoning=reasoning)

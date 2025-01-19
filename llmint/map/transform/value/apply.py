@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "APPLY"
 schema = {
     "type": "function",
@@ -7,29 +10,28 @@ schema = {
         "parameters": {
             "type": "object",
             "properties": {
-                "source_field": {
-                    "type": "string",
-                    "description": "Field from the source schema",
-                },
                 "target_field": {
                     "type": "string",
                     "description": "Field from the target schema",
                 },
-                "function_name": {
+                "function": {
                     "type": "string",
-                    "description": "Function to apply",
+                    "description": "An expression involving source schema field(s) to apply, "
+                                   "replace any spaces in the schema fields with underscores",
                 },
                 "reasoning": {
                     "type": "string",
                     "description": "In-depth reasoning as to why you chose this function",
                 },
             },
-            "required": ["source_field", "target_field", "function_name", "reasoning"],
+            "required": ["target_field", "function", "reasoning"],
         },
     }
 }
 
 
-def func(source_field, target_field, function_name, reasoning):
-    return (f'{{from: {source_field}, to: {target_field}, '
-            f'transformation: APPLY {source_field} {function_name}}}', reasoning)
+def func(target_field, function, reasoning):
+    return Map(source_field=None,
+               target_field=target_field,
+               transformation=f'APPLY {function}',
+               reasoning=reasoning)

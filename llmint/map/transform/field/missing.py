@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "MISSING"
 schema = {
     "type": "function",
@@ -23,5 +26,7 @@ schema = {
 
 
 def func(target_field, reasoning):
-    return (f'{{from: None, to: {target_field}, '
-            f'transformation: MISSING {target_field}}}', reasoning)
+    return Map(source_field=None,
+               target_field=target_field,
+               transformation=f'MISSING',
+               reasoning=reasoning)

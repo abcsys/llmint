@@ -1,3 +1,6 @@
+from llmint.map.function import Map
+
+
 name = "RENAME"
 schema = {
     "type": "function",
@@ -27,6 +30,7 @@ schema = {
 
 
 def func(source_field, target_field, reasoning):
-    return (
-        f'{{from: {source_field}, to: {target_field}, '
-        f'transformation: RENAME {source_field} TO {target_field}}}', reasoning)
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'RENAME TO {target_field}',
+               reasoning=reasoning)
