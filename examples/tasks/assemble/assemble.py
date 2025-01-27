@@ -1,7 +1,7 @@
 import pandas as pd
 
 import llmint
-from llmint.assemble.pandas import assemble
+from llmint.assemble.pandas import assemble, construct
 
 
 def main():
@@ -28,13 +28,16 @@ def main():
     
     source_df = pd.DataFrame([{"Fname": "Josh", "Lname": "Doe", "Age": 31, "Email": "joshdoe@example.com"}])
     dest_df = pd.DataFrame([{"name": "Jane Doe", "age": 27, "email": "janedoe@example.com"}])
+    print("Concat the source dataframe to the dest dataframe:")
     print("Source:", source_df, sep="\n")
     print("Dest:", dest_df, sep="\n")
 
-    mappings = llmint.map(source_df, dest_df)
-    output = assemble(source_df, mappings)
+    mappings = llmint.map(source_schema, target_schema)
+    assembly = assemble(mappings)
+    output = construct(source_df, assembly)
+    
     combined_df = pd.concat([dest_df, output], axis=0)
-    print("Combined:", combined_df, sep="\n")
+    print("\nCombined:", combined_df, sep="\n")
 
 
 if __name__ == "__main__":

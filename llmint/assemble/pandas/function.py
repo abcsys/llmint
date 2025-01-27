@@ -1,36 +1,39 @@
 import pandas as pd
+from typing import List, Callable
 
 from llmint.assemble.pandas.transform import (
-    add, cast, copy, default, delete, missing, rename, apply, link, scale, shift
+    add, copy, default, missing, apply, scale, shift
 )
 from llmint.map.function import Map
 
-def assemble(df: pd.DataFrame, mappings: list[Map]):
-    df_outputs = []
+
+def assemble(mappings: list[Map]):
+    output = []
     
     for mapping in mappings:
         match mapping.transformation.split(' ')[0]:
             case 'ADD':
-                df_outputs.append(add(df, mapping))
-            case 'CAST':
-                df_outputs.append(cast(df, mapping))
+                output.append(add(mapping))
             case 'COPY':
-                df_outputs.append(copy(df, mapping))
+                output.append(copy(mapping))
             case 'DEFAULT':
-                df_outputs.append(default(df, mapping))
-            case 'DELETE':
-                df_outputs.append(delete(df, mapping))
+                output.append(default(mapping))
             case 'MISSING':
-                df_outputs.append(missing(df, mapping))
-            case 'RENAME':
-                df_outputs.append(rename(df, mapping))
+                output.append(missing(mapping))
             case 'APPLY':
-                df_outputs.append(apply(df, mapping))
-            case 'LINK':
-                df_outputs.append(link(df, mapping))
+                output.append(apply(mapping))
             case 'SCALE':
-                df_outputs.append(scale(df, mapping))
+                output.append(scale(mapping))
             case 'SHIFT':
-                df_outputs.append(shift(df, mapping))   
+                output.append(shift(mapping))   
                 
-    return pd.concat(df_outputs, axis=1)
+    return output
+
+
+def construct(df: pd.DataFrame, assembly: List[Callable[[pd.DataFrame], pd.Series]]):
+    df_output = []
+    
+    for func in assembly:
+        df_output.append(func(df))
+    
+    return pd.concat(df_output, axis=1)
