@@ -23,6 +23,7 @@ producer = SerializingProducer(config)
 
 # User data to be sent
 user_data = {"name": "John Doe", "age": 28}
+print("User:", user_data)
 
 # Produce message
 producer.produce(topic='user-info', key=str(user_data['name']), value=user_data)

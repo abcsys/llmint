@@ -69,3 +69,6 @@ system = "\n".join([role, rule, stl, end])
 
 user = "Source Schema: ' + {source_schema} + " \
        "'\nTarget Schema: ' + {target_schema}"
+
+"""Reasoning prompt"""
+reasoning_prompt = "In-depth reasoning as to why you chose this function"

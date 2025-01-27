@@ -1,27 +1,36 @@
+from libem.core.util import create_json_schema
+
+from llmint.map.function import Map
+from llmint.map.parameter import reasoning
+from llmint.map.prompt import reasoning_prompt
+
+
 name = "DELETE"
+description = "Delete a source field"
+properties = {
+    "source_field": (str, "Field from the source schema"),
+}
+if reasoning:
+    properties["reasoning"] = (str, reasoning_prompt)
+
 schema = {
     "type": "function",
     "function": {
         "name": name,
-        "description": "Delete a source field",
+        "description": description,
         "parameters": {
             "type": "object",
-            "properties": {
-                "source_field": {
-                    "type": "string",
-                    "description": "Field from the source schema",
-                },
-                "reasoning": {
-                    "type": "string",
-                    "description": "In-depth reasoning as to why you chose this function",
-                },
-            },
-            "required": ["source_field", "reasoning"],
-        },
+            "properties": create_json_schema(
+                **properties
+            )["properties"],
+            "required": list(properties.keys()),
+        }
     }
 }
 
 
-def func(source_field, reasoning):
-    return (f'{{from: {source_field}, to: None, '
-            f'transformation: DELETE {source_field}}}', reasoning)
+def func(source_field, reasoning=None):
+    return Map(source_field=source_field,
+               target_field=None,
+               transformation=f'DELETE',
+               reasoning=reasoning)

@@ -1,32 +1,37 @@
+from libem.core.util import create_json_schema
+
+from llmint.map.function import Map
+from llmint.map.parameter import reasoning
+from llmint.map.prompt import reasoning_prompt
+
+
 name = "RENAME"
+description = "Rename a source field"
+properties = {
+    "source_field": (str, "Field from the source schema"),
+    "target_field": (str, "Field from the target schema"),
+}
+if reasoning:
+    properties["reasoning"] = (str, reasoning_prompt)
+
 schema = {
     "type": "function",
     "function": {
         "name": name,
-        "description": "Rename a source field",
+        "description": description,
         "parameters": {
             "type": "object",
-            "properties": {
-                "source_field": {
-                    "type": "string",
-                    "description": "Field from the source schema",
-                },
-                "target_field": {
-                    "type": "string",
-                    "description": "Field from the target schema",
-                },
-                "reasoning": {
-                    "type": "string",
-                    "description": "In-depth reasoning as to why you chose this function",
-                },
-            },
-            "required": ["source_field", "target_field", "reasoning"],
-        },
+            "properties": create_json_schema(
+                **properties
+            )["properties"],
+            "required": list(properties.keys()),
+        }
     }
 }
 
 
-def func(source_field, target_field, reasoning):
-    return (
-        f'{{from: {source_field}, to: {target_field}, '
-        f'transformation: RENAME {source_field} TO {target_field}}}', reasoning)
+def func(source_field, target_field, reasoning=None):
+    return Map(source_field=source_field,
+               target_field=target_field,
+               transformation=f'RENAME TO {target_field}',
+               reasoning=reasoning)

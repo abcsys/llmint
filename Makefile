@@ -8,7 +8,7 @@ install:
 
 .PHONY: run map
 map: 
-	python examples/map.py
+	python examples/tasks/map/map.py
 run: map
 
 .PHONY: benchmark_match, benchmark_mapper, test
